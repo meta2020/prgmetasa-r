@@ -6,7 +6,6 @@
 
 
 .clk.TNM.ml <- function(
-  
   par, y1, y2, y3,
   v1, v2, v3, v12, v13, v23,
   p, a.interval

@@ -10,8 +10,8 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 rm(list = ls())
-files.sources <- list.files(path = "funs/")
-x <- sapply(paste0("funs/", files.sources), source)
+files.sources <- list.files(path = "../funs/")
+x <- sapply(paste0("../funs/", files.sources), source)
 library(mixmeta)
 library(readxl)
 library(pryr)
@@ -152,9 +152,9 @@ sauc3 <- SAUC(par3[c(1,2,4,5,7)])
 ## INITIAL VALUE
 
 init3 <- c(mean(y1), mean(y2), mean(y3), mean(v1), mean(v2), mean(v3), mean(v12), mean(v13), mean(v23))
-fn.tnm.cho <- function(par) .llk.TNM.cho(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
-fn.tnmcho <- nlminb(par3, fn.tnm.cho)
-round(fn.tnmcho$par, 6)
+# fn.tnm.cho <- function(par) .llk.TNM.cho(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
+# fn.tnmcho <- nlminb(par3, fn.tnm.cho)
+# round(fn.tnmcho$par, 6)
 
 fn.tnm.ml <- function(par) .llk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
 fn.tnmml<- nlminb(par3, fn.tnm.ml)
@@ -242,7 +242,7 @@ sauc.mat.3
 
 
 fn.o <- function(par) .clk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23,
-                         p = 23/38, 
+                         p = 0.6, 
                          a.interval= c(-10, 10)
                          )
 
@@ -353,9 +353,9 @@ sauc3 <- SAUC(par3[c(1,2,4,5,7)])
 ## INITIAL VALUE
 
 init3 <- c(mean(y1), mean(y2), mean(y3), mean(v1), mean(v2), mean(v3), mean(v12), mean(v13), mean(v23))
-fn.tnm.cho <- function(par) .llk.TNM.cho(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
-fn.tnmcho <- nlminb(par3, fn.tnm.cho)
-round(fn.tnmcho$par, 6)
+# fn.tnm.cho <- function(par) .llk.TNM.cho(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
+# fn.tnmcho <- nlminb(par3, fn.tnm.cho)
+# round(fn.tnmcho$par, 6)
 
 fn.tnm.ml <- function(par) .llk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
 fn.tnmml<- nlminb(par3, fn.tnm.ml)
@@ -451,7 +451,7 @@ par(mfrow = c(1,1))
 
 ```{r, fig.height=5, fig.width=5}
 fn.o <- function(par) .clk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23,
-                         p = 23/38, 
+                         p = 0.6, 
                          a.interval= c(-10, 10)
                          )
 
@@ -488,11 +488,21 @@ par(mfrow = c(1,2))
 
 SROC(par = par.mvm.3, sroc.type = "sroc")
 points(plogis(-y2), plogis(y1))
-title("3 year with p = 23/38")
+legend("bottomright", 
+       bty='n',
+       legend = c(sprintf("p = %.1f, SAUC = %.3f", c(1, 23/38), c(sauc.mat.3[1,c(1,5)]))), 
+       col = c("black", "grey"), pch = 18, pt.cex = 2, cex = 1, 
+       lty = rep(1,2))
+title("3 year")
 
 SROC(par = par.mvm.5, sroc.type = "sroc")
 points(plogis(-y2), plogis(y1))
-title("5 year with p = 23/38")
+legend("bottomright", 
+       bty='n',
+       legend = c(sprintf("p = %.1f, SAUC = %.3f", c(1, 23/38), c(sauc.mat.5[1,c(1,5)]))), 
+       col = c("black", "grey"), pch = 18, pt.cex = 2, cex = 1, 
+       lty = rep(1,2))
+title("5 year")
 
 par(mfrow = c(1,1))
 

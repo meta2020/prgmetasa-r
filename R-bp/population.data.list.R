@@ -1,17 +1,13 @@
+##******************************************************************************
 ##
-## 1. CREATE POPULATION STUDIES DATA (LIST) ----
+## CREATE POPULATION STUDIES DATA (LIST) ----
 ##
+##******************************************************************************
 
-population.data.list <- function(
-	S, 
-	tK, 
-	N.min, N.max,  ## NUMBER OF PTS
-	CD = c("EXP", "LN", "UNIF"),  ## CENSOR DIST.
-	Exp.r, logm, logs, minc, maxc, 
-	x1.u, x2.u, x1.s, x2.s, v.sd
-	){
+
+.population.data.list <- function(S, tK, Unif.min, Unif.max, CD = c("EXP", "LN", "UNIF"), Exp.r, logm, logs, minc, maxc, x1.u, x2.u, x1.s, x2.s, v.sd){
 	
-	# S <- 30; tK <- 2; n.mean <-4; n.sd <-1; Exp.r <- 0.2; CD = "EXP"; x1.u <- 0.7; x2.u <- 0.3; x1.s <- 0.1; x2.s <- 0.3; v.sd <- 2; N.min = 50; N.max = 150
+	# S <- 30; tK <- 2; n.mean <-4; n.sd <-1; Exp.r <- 0.2; CD = "EXP"; x1.u <- 0.7; x2.u <- 0.3; x1.s <- 0.1; x2.s <- 0.3; v.sd <- 2
 	
 	lapply(1:S, function(i){
 		
@@ -19,7 +15,7 @@ population.data.list <- function(
 		
 		## NUMBER OF SUBJECTS FOR S STUDIES: n0, n1
 		
-		n.i <- round(runif(1, min = N.min, max = N.max))
+		n.i <- round(runif(1, min = Unif.min, max = Unif.max))
 	  # n.i <- max(4, round(rlnorm(1, mean = n.mean, sd = n.sd)))
 	  # i <- 1; n.i <- 10
 		

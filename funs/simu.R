@@ -38,6 +38,17 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
     dataSt.p$slt.id <- select.id(dataSt.p, b, a)
     dataSt.o <- dataSt.p[dataSt.p$slt.id == 1, ]
     
+    if(nrow(dataSt.o)==0) {
+      
+      bnm.p  <- rep(NA, 13)
+      bnm.o  <- rep(NA, 13)
+      tnm.sa <- rep(NA, 13)
+      res <- cbind(bnm.p, bnm.o, tnm.sa)
+      rownames(res) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
+      res
+      
+    }
+    
     ## MARGINAL p
     prop <- nrow(dataSt.o)/nrow(dataSt.p)
     p.hat <- mean(pnorm(b * dataSt.p$t_lnHR + a), na.rm = TRUE)
@@ -83,12 +94,15 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
     bnm.p  <- c(rep(NA, 11), SS, NA)
     bnm.o  <- c(rep(NA, 11), NN, NA)
     tnm.sa <- c(rep(NA, 11), prop, NA)
+    tnm.int<- colMeans(cbind(o.y1, o.y2,o.y3, o.s11, o.s22, o.s33, o.s12, o.s13, o.s23))
     
     ## 1 BNM.P ----
     {
       bnm.int    <- c(mean(p.y1), mean(p.y2), mean(p.s11), mean(p.s22), mean(p.s12))
       fn.bnm.ml  <- function(par) .llk.BNM.ml(par, p.y1, p.y2, p.s11, p.s22, p.s12)
-      fit.bnm_p  <- nlminb(bnm.int, fn.bnm.ml)
+      fit.bnm_p  <- nlminb(bnm.int, fn.bnm.ml,
+                           lower = c(rep(-Inf,2), rep(0, 2),   rep(-1,2)),
+                           upper = c(rep( Inf,2), rep(Inf, 2), rep( 1,2)) )
       # par.bnm.ml <- opt.bnm.ml$par
 
       if(!inherits(fit.bnm_p, "try-error")) {
@@ -125,7 +139,7 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
           
           sauc  <- SAUC(par = fit.bnm_o$par)  # u1 u2 t1 t2 r1
           
-          bnm.o <- c(fit.bnm_o$par[1:2], NA, fit.bnm_o$par[3:4], NA, fit.bnm_o$par[5], NA, NA, NA, sauc, SS, conv_p)
+          bnm.o <- c(fit.bnm_o$par[1:2], NA, fit.bnm_o$par[3:4], NA, fit.bnm_o$par[5], NA, NA, NA, sauc, SS, conv)
           
         }  
       } 
@@ -139,13 +153,11 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
       Y   <- as.matrix( cbind(o.y1, o.y2, o.y3) )
       Sig <- as.matrix( cbind(o.s11, o.s12, o.s13, o.s22, o.s23, o.s33) )
       
-      fit.tnm_o <- try(mixmeta(Y4, Sig4, method = "ml"), silent = TRUE)
+      fit.tnm_o <- try(mixmeta(Y, Sig, method = "ml"), silent = TRUE)
       
       if(!inherits(fit.tnm_o, "try-error")) {
         
-        conv_o <- fit.tnm_o$converged
-        
-        if(conv_o){
+        if(fit.tnm_o$converged){ 
           
           u    <- fit.tnm_o$coefficients
           tt   <- c(fit.tnm_o$Psi)
@@ -156,9 +168,8 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
           
           #sauc <- SAUC(par = c(u[1:2], t123[1:2], r1))
           
-          tnm.init <- c(mu = unname(u), tau = t123, rho1 = r1, rho2 = r2, rho3 = r3)
+          tnm.int <- c(mu = unname(u), tau = t123, rho1 = r1, rho2 = r2, rho3 = r3)}
           
-        }
       }
       
     }
@@ -167,7 +178,7 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
     
     {
       fn.tnm.ml  <- function(par) .clk.TNM.ml(par, o.y1, o.y2, o.y3, o.s11, o.s22, o.s33, o.s12, o.s13, o.s23, p=p.hat, a.interval = c(-10, 10))
-      fit.tnm_sa  <- nlminb(
+      fit.tnm_sa <- nlminb(
         c(tnm.int, b0), fn.tnm.ml,
         lower = c(rep(-Inf,3), rep(0, 3),   rep(-1,3), 0),
         upper = c(rep( Inf,3), rep(Inf, 3), rep( 1,3), 2) )
@@ -189,7 +200,7 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
     }
   
   
-  res <- cbind(bnm.p, bnm.p, tnm.sa)
+  res <- cbind(bnm.p, bnm.o, tnm.sa)
   rownames(res) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
   res
   

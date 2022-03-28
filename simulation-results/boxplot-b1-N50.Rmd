@@ -1,5 +1,5 @@
 ---
-title: "BoxPlot-b1-N30"
+title: "BoxPlot-b1-N50"
 author: "Yi"
 date: "`r Sys.Date()`"
 output: html_document
@@ -26,77 +26,25 @@ Others follows Hattori (2016).
 
 p <- seq(0.8, 0.2, -0.2)
 
-load("N30/HR1_p0.8.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med8 <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv   <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv8  <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-p    <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-p8   <- sapply(1:3, function(i) mean(p[,i], na.rm = TRUE))
-
-load("N30/HR1_p0.6.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med6  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv6 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-p    <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-p6   <- sapply(1:3, function(i) mean(p[,i], na.rm = TRUE))
-
-load("N30/HR1_p0.4.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med4  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv4 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-p    <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-p4   <- sapply(1:3, function(i) mean(p[,i], na.rm = TRUE))
-
-load("N30/HR1_p0.2.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med2  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv2 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-p    <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-p2   <- sapply(1:3, function(i) mean(p[,i], na.rm = TRUE))
-
-
-x <- rbind(med8, med6, med4, med2)
-matplot(x, ylim = c(0.5, 1), type = "o", ylab = "Med(SAUC)", xlab = "p", xaxt = "n", pch = 1:3)
-legend("topleft", c("All studies", "Published studies", "Sensitivity analysis"), col = 1:3, lty = 1:3, pch = 1:3)
-
-axis(1, at = 1:4, labels = seq(0.8, 0.2, -0.2))
-cv <- rbind(cv8, cv6, cv4, cv2)
-cv
-p  <- rbind(cv8, cv6, cv4, cv2)
-p
-
-```
-
-
-
-```{r, fig.width = 10, fig.height = 5}
-
-p <- seq(0.8, 0.2, -0.2)
-
-load("N30/HR2_p0.8.RData")
+load("N50/HR1_p0.8.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med8 <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv8 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
 
-
-load("N30/HR2_p0.6.RData")
+load("N50/HR1_p0.6.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med6  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv6 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
 
-load("N30/HR2_p0.4.RData")
+load("N50/HR1_p0.4.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med4  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv4 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
 
-load("N30/HR2_p0.2.RData")
+load("N50/HR1_p0.2.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med2  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
@@ -118,25 +66,65 @@ cv
 
 p <- seq(0.8, 0.2, -0.2)
 
-load("N30/HR3_p0.8.RData")
+load("N50/HR2_p0.8.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med8 <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv8 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
 
-load("N30/HR3_p0.6.RData")
+load("N50/HR2_p0.6.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med6  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv6 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
 
-load("N30/HR3_p0.4.RData")
+load("N50/HR2_p0.4.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med4  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv4 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
 
-load("N30/HR3_p0.2.RData")
+load("N50/HR2_p0.2.RData")
+sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+med2  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
+cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
+cv2 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
+
+
+x <- rbind(med8, med6, med4, med2)
+matplot(x, ylim = c(0.5, 1), type = "o", ylab = "Med(SAUC)", xlab = "p", xaxt = "n", pch = 1:3)
+legend("topleft", c("All studies", "Published studies", "Sensitivity analysis"), col = 1:3, lty = 1:3, pch = 1:3)
+
+axis(1, at = 1:4, labels = seq(0.8, 0.2, -0.2))
+cv <- rbind(cv8, cv6, cv4, cv2)
+cv
+```
+
+
+
+```{r, fig.width = 10, fig.height = 5}
+
+p <- seq(0.8, 0.2, -0.2)
+
+load("N50/HR3_p0.8.RData")
+sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+med8 <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
+cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
+cv8 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
+
+load("N50/HR3_p0.6.RData")
+sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+med6  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
+cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
+cv6 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
+
+load("N50/HR3_p0.4.RData")
+sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+med4  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
+cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
+cv4 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
+
+load("N50/HR3_p0.2.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
 med2  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)

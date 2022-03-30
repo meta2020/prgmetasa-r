@@ -184,4 +184,4 @@ a <- round(
 
 names(a) <- c(paste0("hr1.", seq(0.8, 0.2,-0.2)), paste0("hr2.", seq(0.8, 0.2,-0.2)), paste0("hr3.", seq(0.8, 0.2,-0.2)))
 
-save(a, file = paste0("beta_", b0, "_alpha_", N, ".RData"))
+save(a, file = paste0("beta_", b0, "_alpha2_", N, ".RData"))

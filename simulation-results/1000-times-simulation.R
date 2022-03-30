@@ -19,11 +19,12 @@
   
   files.sources <- list.files(path = "../funs/")
   x <- sapply(paste0("../funs/", files.sources), source)
-  N <- 40; tK0 <- 2
+  N <- 100; tK0 <- 2
+  load(sprintf("a-calc/beta_1_alpha_%d.RData", N))
 
 }
 
-load("a-calc/beta_1_alpha_40.RData")
+
 ncores <- detectCores() 
 cl <- makeCluster(ncores, "SOCK")
 doSNOW::registerDoSNOW(cl)
@@ -143,7 +144,7 @@ save(DATA, file = sprintf("N%d/HR2_p%.1f.RData", N, p))
 ##
 ##******************************************************************************
 
-x1.u <- 0.8; x2.u <- 0.2; x1.s <- 0.1; x2.s <- 0.2; v.sd <- 0.2
+x1.u <- 0.8; x2.u <- 0.2; x1.s <- 0.3; x2.s <- 0.1; v.sd <- 0.2
 
 # 0.8 ----
 p <- 0.8

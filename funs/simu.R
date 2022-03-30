@@ -9,8 +9,9 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
 
   
   # files.sources <- list.files(path = ""); x <- sapply(paste0("", files.sources), source); library(survival); library(mixmeta)
-  
+  # load(sprintf("a-calc/beta_1_alpha_%d.RData", N))
   # S <- 40; tK <- 3; b <- 2; a <- -3; N.min <- 50; N.max <- 150; CD = "EXP"; Exp.r <- 0.2; x1.u <- 0.7; x2.u <- 0.3; x1.s <- 0.1; x2.s <- 0.3; v.sd <- 0.2; p <- 0.7
+  # S = N/0.2; tK = 2; b = 1; a = a[12]; N.min = 50; N.max= 150; CD = "EXP"; Exp.r = 0.2; x1.u = x1.u; x2.u = x2.u; x1.s = x1.s; x2.s = x2.s; v.sd = v.sd
   
   ####### RUN
   {
@@ -38,22 +39,28 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
     dataSt.p$slt.id <- select.id(dataSt.p, b, a)
     dataSt.o <- dataSt.p[dataSt.p$slt.id == 1, ]
     
-    if(nrow(dataSt.o)==0) {
-      
-      bnm.p  <- rep(NA, 13)
-      bnm.o  <- rep(NA, 13)
-      tnm.sa <- rep(NA, 13)
-      res <- cbind(bnm.p, bnm.o, tnm.sa)
-      rownames(res) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
-      res
-      
-    }
+    
+    SS <- nrow(dataSt.p)
+    NN <- nrow(dataSt.o)
     
     ## MARGINAL p
     prop <- nrow(dataSt.o)/nrow(dataSt.p)
     p.hat <- mean(pnorm(b * dataSt.p$t_lnHR + a), na.rm = TRUE)
     
-
+    
+    bnm.p  <- c(rep(NA, 11), SS, NA)
+    bnm.o  <- c(rep(NA, 11), NN, NA)
+    tnm.sa <- c(rep(NA, 11), prop, NA)
+    
+    
+    if(nrow(dataSt.o)==0) {
+      
+      res <- matrix(NA, nrow = 13, ncol = 3)
+      rownames(res) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
+      res
+      
+    } else {
+      
     ## INITIAL b
     
     b0 <- 0.5
@@ -88,12 +95,7 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
 
     ## POPULATION----
     
-    SS <- nrow(dataSt.p)
-    NN <- nrow(dataSt.o)
     
-    bnm.p  <- c(rep(NA, 11), SS, NA)
-    bnm.o  <- c(rep(NA, 11), NN, NA)
-    tnm.sa <- c(rep(NA, 11), prop, NA)
     tnm.int<- colMeans(cbind(o.y1, o.y2,o.y3, o.s11, o.s22, o.s33, o.s12, o.s13, o.s23))
     
     ## 1 BNM.P ----
@@ -139,7 +141,7 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
           
           sauc  <- SAUC(par = fit.bnm_o$par)  # u1 u2 t1 t2 r1
           
-          bnm.o <- c(fit.bnm_o$par[1:2], NA, fit.bnm_o$par[3:4], NA, fit.bnm_o$par[5], NA, NA, NA, sauc, SS, conv)
+          bnm.o <- c(fit.bnm_o$par[1:2], NA, fit.bnm_o$par[3:4], NA, fit.bnm_o$par[5], NA, NA, NA, sauc, NN, conv)
           
         }  
       } 
@@ -206,6 +208,7 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
   
   }
   
+  }
   
   #######
   

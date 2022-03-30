@@ -15,7 +15,7 @@
   library(testit)
   files.sources <- list.files(path = "../../funs/")
   x <- sapply(paste0("../../funs/", files.sources), source)
-  N <- 50; tK0 <- 2; b0 <- 1
+  N <- 100; tK0 <- 2; b0 <- 1
 }
 
 

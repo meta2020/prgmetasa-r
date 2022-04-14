@@ -10,8 +10,8 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 rm(list = ls())
-files.sources <- list.files(path = "../funs/")
-x <- sapply(paste0("../funs/", files.sources), source)
+files.sources <- list.files(path = "../R/")
+x <- sapply(paste0("../R/", files.sources), source)
 library(mixmeta)
 library(readxl)
 library(pryr)
@@ -236,7 +236,7 @@ sauc.mat.3
 
 
 
-### 3-YEAR SA given 23/38
+### 3-YEAR sensitivity analysis given  $p=0.6\approx 23/38$
 
 ```{r, fig.height=5, fig.width=5}
 
@@ -428,7 +428,7 @@ sauc.mat.5
 
 #### PLOT1
 
-```{r, fig.height=5, fig.width=10}
+```{r, fig.height=5, fig.width=10, include=FALSE}
 par(mfrow = c(1,2))
 
 matplot(y = t(sauc.mat.3[1:3,]), ylim = c(0.5,0.8), type = "b", 
@@ -447,7 +447,7 @@ par(mfrow = c(1,1))
 
 
 
-### 5-YEART SA given 23/38
+### 5-YEART sensitivity analysis given $p=0.6\approx 23/38$
 
 ```{r, fig.height=5, fig.width=5}
 fn.o <- function(par) .clk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23,
@@ -482,9 +482,10 @@ par.mvm.5
 
 #### PLOT2
 
-```{r, fig.height=5, fig.width=10}
+```{r, fig.height=5, fig.width=10, include=FALSE}
 ## p = 1, 0.6, 0.2
 par(mfrow = c(1,2))
+
 
 SROC(par = par.mvm.3, sroc.type = "sroc")
 points(plogis(-y2), plogis(y1))
@@ -506,6 +507,47 @@ title("5 year")
 
 par(mfrow = c(1,1))
 
+```
+
+#### PLOT
+
+```{r, fig.height=8, fig.width=8}
+
+setEPS(width = 9, height = 9); postscript("ki67.eps")
+
+par(mfrow = c(2,2))
+
+matplot(y = t(sauc.mat.3[1:3,]), ylim = c(0.5,0.8), type = "b", 
+        pch = 20, col = c(1,2,2), lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
+axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
+title(main = paste0(3, " year"))
+
+matplot(y = t(sauc.mat.5[1:3,]), ylim = c(0.5,0.8), type = "b", 
+        pch = 20, col = c(1,2,2), lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
+axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
+title(main = paste0(5, " year"))
+
+SROC(par = par.mvm.3, sroc.type = "sroc")
+points(plogis(-y2), plogis(y1))
+legend("bottomright", 
+       bty='n',
+       legend = c(sprintf("p = %.1f, SAUC = %.3f", c(1, 23/38), c(sauc.mat.3[1,c(1,5)]))), 
+       col = c("black", "grey"), pch = 18, pt.cex = 2, cex = 1, 
+       lty = rep(1,2))
+title("3 year")
+
+SROC(par = par.mvm.5, sroc.type = "sroc")
+points(plogis(-y2), plogis(y1))
+legend("bottomright", 
+       bty='n',
+       legend = c(sprintf("p = %.1f, SAUC = %.3f", c(1, 23/38), c(sauc.mat.5[1,c(1,5)]))), 
+       col = c("black", "grey"), pch = 18, pt.cex = 2, cex = 1, 
+       lty = rep(1,2))
+title("5 year")
+
+par(mfrow = c(1,1))
+
+dev.off()
 ```
 
 

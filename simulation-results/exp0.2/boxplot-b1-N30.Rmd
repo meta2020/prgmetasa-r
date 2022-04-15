@@ -16,14 +16,6 @@ library(kableExtra)
 
 
 
-## Median
-
-Number of patients $\sim Uniform[50, 150], b = 1$
-
-$X_1\sim N(x1.u, x1.s^2)$; 
-
-$X_2\sim N(x2.u, x2.s^2)$
-
 ### 1
 
 ```{r, fig.width = 10, fig.height = 5}
@@ -158,69 +150,3 @@ cv
 # x
 ```
 
-### 3
-
-```{r, fig.width = 10, fig.height = 5}
-load("a-calc/beta_1_alpha_30.RData")
-set$set3
-p <- seq(0.8, 0.2, -0.2)
-
-load("N30/HR3_p0.8.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med8 <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv8 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-pro  <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-pro8 <- sapply(1:3, function(i) mean(pro[,i], na.rm = TRUE))
-dim(DATA) <- c(13, 3, dim(DATA)[2]/3)
-MED <- apply(DATA, 1:2, function(x) median(x, na.rm = TRUE))
-rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
-# MED
-
-load("N30/HR3_p0.6.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med6  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv6 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-pro  <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-pro6 <- sapply(1:3, function(i) mean(pro[,i], na.rm = TRUE))
-dim(DATA) <- c(13, 3, dim(DATA)[2]/3)
-MED <- apply(DATA, 1:2, function(x) median(x, na.rm = TRUE))
-rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
-# MED
-
-load("N30/HR3_p0.4.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med4  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv4 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-pro  <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-pro4 <- sapply(1:3, function(i) mean(pro[,i], na.rm = TRUE))
-dim(DATA) <- c(13, 3, dim(DATA)[2]/3)
-MED <- apply(DATA, 1:2, function(x) median(x, na.rm = TRUE))
-rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
-# MED
-
-load("N30/HR3_p0.2.RData")
-sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
-med2  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
-cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
-cv2 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
-pro  <- matrix(DATA[12,], ncol = 3, byrow = TRUE)
-pro2 <- sapply(1:3, function(i) mean(pro[,i], na.rm = TRUE))
-dim(DATA) <- c(13, 3, dim(DATA)[2]/3)
-MED <- apply(DATA, 1:2, function(x) median(x, na.rm = TRUE))
-rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
-# MED
-
-x <- rbind(med8, med6, med4, med2)
-matplot(x, ylim = c(0.5, 1), type = "o", ylab = "Med(SAUC)", xlab = "p", xaxt = "n", pch = 1:3)
-legend("bottomleft", c("All studies", "Published studies", "Sensitivity analysis"), col = 1:3, lty = 1:3, pch = 1:3)
-
-axis(1, at = 1:4, labels = seq(0.8, 0.2, -0.2))
-cv <- rbind(cv8, cv6, cv4, cv2)
-cv
-# prop  <- rbind(pro8, pro6, pro4, pro2)
-# prop
-# x
-```

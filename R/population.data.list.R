@@ -7,7 +7,7 @@ population.data.list <- function(
 	tK, 
 	N.min, N.max,  ## NUMBER OF PTS
 	CD = c("EXP", "LN", "UNIF"),  ## CENSOR DIST.
-	Exp.r, logm, logs, minc, maxc, 
+	Exp.r, meanlog, sdlog, minc, maxc, 
 	x1.u, x2.u, x1.s, x2.s, v.sd
 	){
 	
@@ -28,7 +28,7 @@ population.data.list <- function(
 		T.fail <- exp(rnorm(n.i, mean = 1, sd = 1))
 		
 		if (CD == "EXP")  T.cens <- rexp(  n.i, rate = Exp.r)
-		if (CD == "LN")   T.cens <- rlnorm(n.i, meanlog = logm, sdlog = logs)
+		if (CD == "LN")   T.cens <- rlnorm(n.i, meanlog = meanlog, sdlog = sdlog)
 		if (CD == "UNIF") T.cens <- runif( n.i, min = minc, max = maxc)
 		
 		Y.time <- pmin(T.fail, T.cens)

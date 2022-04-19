@@ -46,7 +46,8 @@ S0 <- round(N/p)
 alpha <- set$alpha1[1]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
 	
-	simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+	simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+	     x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
 save(DATA, file = sprintf("N%d/HR1_p%.1f.RData", N, p))
@@ -57,7 +58,8 @@ S0 <- round(N/p)
 alpha <- set$alpha1[2]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
   
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+       x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
 save(DATA, file = sprintf("N%d/HR1_p%.1f.RData", N, p))
@@ -68,7 +70,8 @@ S0 <- round(N/p)
 alpha <- set$alpha1[3]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
   
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+       x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
 save(DATA, file = sprintf("N%d/HR1_p%.1f.RData", N, p))
@@ -79,7 +82,8 @@ S0 <- round(N/p)
 alpha <- set$alpha1[4]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
   
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+       x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
 save(DATA, file = sprintf("N%d/HR1_p%.1f.RData", N, p))
@@ -103,7 +107,8 @@ S0 <- round(N/p)
 alpha <- set$alpha2[1]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+       x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }
 save(DATA, file = sprintf("N%d/HR2_p%.1f.RData", N, p))
@@ -114,7 +119,8 @@ S0 <- round(N/p)
 alpha <- set$alpha2[2]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+       x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }
 save(DATA, file = sprintf("N%d/HR2_p%.1f.RData", N, p))
@@ -125,7 +131,8 @@ S0 <- round(N/p)
 alpha <- set$alpha2[3]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+       x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }
 save(DATA, file = sprintf("N%d/HR2_p%.1f.RData", N, p))
@@ -136,7 +143,8 @@ S0 <- round(N/p)
 alpha <- set$alpha2[4]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+       x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }
 save(DATA, file = sprintf("N%d/HR2_p%.1f.RData", N, p))

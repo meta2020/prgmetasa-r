@@ -38,7 +38,8 @@ p0 <- 0.8
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "c", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0, b = b0, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0, b = b0, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr1.a_0.8 <- mean(DATA)
@@ -48,7 +49,8 @@ p0 <- 0.6
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr1.a_0.6 <- mean(DATA)
@@ -58,7 +60,8 @@ p0 <- 0.4
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0,N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0,  b = b0,N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr1.a_0.4 <- mean(DATA)
@@ -68,7 +71,8 @@ p0 <- 0.2
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr1.a_0.2 <- mean(DATA)
@@ -89,7 +93,8 @@ p0 <- 0.8
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr2.a_0.8 <- mean(DATA)
@@ -99,7 +104,8 @@ p0 <- 0.6
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr2.a_0.6 <- mean(DATA)
@@ -109,7 +115,8 @@ p0 <- 0.4
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr2.a_0.4 <- mean(DATA)
@@ -119,7 +126,8 @@ p0 <- 0.2
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "EXP", Exp.r = 0.2, x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "LN", meanlog = 1.5*log(2), sdlog = log(2),
+  										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
 hr2.a_0.2 <- mean(DATA)

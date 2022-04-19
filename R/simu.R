@@ -5,7 +5,7 @@
 
 ## 1. CREATE POPULATION LIST ----
 
-simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x1.u, x2.u, x1.s, x2.s, v.sd){
+simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, meanlog, sdlog, minc, maxc, x1.u, x2.u, x1.s, x2.s, v.sd){
 
   
   # files.sources <- list.files(path = ""); x <- sapply(paste0("", files.sources), source); library(survival); library(mixmeta)
@@ -17,7 +17,7 @@ simu <- function(S, tK, b, a, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x
   {
     ## POPULATION DATA
     
-    p_dataSt.all <- population.data.list(S, tK, N.min, N.max, CD, Exp.r, logm, logs, minc, maxc, x1.u, x2.u, x1.s, x2.s, v.sd)
+    p_dataSt.all <- population.data.list(S, tK, N.min, N.max, CD, Exp.r, meanlog, sdlog, minc, maxc, x1.u, x2.u, x1.s, x2.s, v.sd)
     p_dataSt <- as.data.frame(t(sapply(1:length(p_dataSt.all), function(i) p_dataSt.all[[i]][[1]])))
     
     ## REMOVE NA

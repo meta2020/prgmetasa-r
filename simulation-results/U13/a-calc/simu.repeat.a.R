@@ -38,7 +38,7 @@ p0 <- 0.8
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "c", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0, b = b0, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0, b = b0, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
@@ -49,7 +49,7 @@ p0 <- 0.6
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
@@ -60,7 +60,7 @@ p0 <- 0.4
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0,N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0,  b = b0,N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
@@ -71,7 +71,7 @@ p0 <- 0.2
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
@@ -93,7 +93,7 @@ p0 <- 0.8
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
@@ -104,7 +104,7 @@ p0 <- 0.6
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
@@ -115,7 +115,7 @@ p0 <- 0.4
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }
@@ -126,7 +126,7 @@ p0 <- 0.2
 S0 <- round(N/p0)
 DATA <- foreach(r=1:100, .combine = "cbind", .packages = c("mixmeta", "survival"))  %dorng%  {  # 
   
-  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  sim.alpha(S = S0, tK = tK0,  b = b0, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
   										x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd, p = p0)
   
 }

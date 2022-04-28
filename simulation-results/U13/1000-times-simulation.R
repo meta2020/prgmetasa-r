@@ -46,7 +46,7 @@ S0 <- round(N/p)
 alpha <- set$alpha1[1]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
 	
-	simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+	simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
 	     x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
@@ -58,7 +58,7 @@ S0 <- round(N/p)
 alpha <- set$alpha1[2]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
   
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
        x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
@@ -70,7 +70,7 @@ S0 <- round(N/p)
 alpha <- set$alpha1[3]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
   
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
        x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
@@ -82,7 +82,7 @@ S0 <- round(N/p)
 alpha <- set$alpha1[4]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  # 
   
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
        x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
   
 }
@@ -107,7 +107,7 @@ S0 <- round(N/p)
 alpha <- set$alpha2[1]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
        x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }
@@ -119,7 +119,7 @@ S0 <- round(N/p)
 alpha <- set$alpha2[2]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
        x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }
@@ -131,7 +131,7 @@ S0 <- round(N/p)
 alpha <- set$alpha2[3]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
        x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }
@@ -143,7 +143,7 @@ S0 <- round(N/p)
 alpha <- set$alpha2[4]
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("mixmeta", "survival"), .errorhandling = "remove")  %dorng%  {  #
 
-  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", min = 1, max = 4,
+  simu(S = S0, tK = tK0, b = 1, a = alpha, N.min = 50, N.max= 150, CD = "UNIF", minc = 1, maxc = 4,
        x1.u = x1.u, x2.u = x2.u, x1.s = x1.s, x2.s = x2.s, v.sd = v.sd)
 
 }

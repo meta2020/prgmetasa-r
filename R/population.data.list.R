@@ -11,7 +11,7 @@ population.data.list <- function(
 	x1.u, x2.u, x1.s, x2.s, v.sd
 	){
 	
-	# S <- 30; tK <- 2; n.mean <-4; n.sd <-1; Exp.r <- 0.2; CD = "EXP"; x1.u <- 0.7; x2.u <- 0.3; x1.s <- 0.1; x2.s <- 0.3; v.sd <- 2; N.min = 50; N.max = 150
+	# S <- 30; tK <- 2; n.mean <-4; n.sd <-1; Exp.r <- 0.2; CD = "EXP"; x1.u <- 0.7; x2.u <- 0.3; x1.s <- 0.1; x2.s <- 0.3; v.sd <- 1; N.min = 50; N.max = 150
 	
 	lapply(1:S, function(i){
 		
@@ -63,13 +63,15 @@ population.data.list <- function(
 			
 			names(x) <- c("study.id", "ty", "n0", "n1", "s0", "s1", "med.ty", "s0_mct", "s1_mct", "u_lnHR", "v_lnHR", "cutoff")
 			
-			list(s.tK = x, fit.km = NULL)
+			fit.km <- NULL
+			
+			# list(s.tK = x, fit.km = NULL, marker = X)
 			
 		} else{
 			
 			fit.km <- survfit(Surv(Y.time, status) ~ X.grp)
 			# km.info <- summary(fit.km)
-			# plot(fit.km)
+			plot(fit.km)
 			
 			## 2.4. s1_s0 AT tK----
 			t0 <- fit.km$time[1:n0]
@@ -107,10 +109,11 @@ population.data.list <- function(
 			names(x) <- c("study.id", "ty", "n0", "n1", "s0", "s1", "med.ty", "s0_mct", "s1_mct", "u_lnHR", "v_lnHR", "cutoff")
 			
 			# plot(fit.km)
-			
-			list(s.tK = x, fit.km = fit.km)
-			
 		}
+		
+			return(list(s.tK = x, fit.km = fit.km, marker = X))
+			
+		
 		
 	})
 	

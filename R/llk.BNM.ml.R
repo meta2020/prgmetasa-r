@@ -34,7 +34,7 @@
 
   f.l1  <- ((y1-u1)^2*(v22) - 2*(y2-u2)*(y1-u1)*v12 + (y2-u2)^2*(v11)) / det.vec + log.det.vec
 
-  s.l1  <- -0.5*sum(f.l1, na.rm = TRUE)
+  s.l1  <- 0.5*sum(f.l1, na.rm = TRUE)
 
-  -s.l1
+  return(s.l1)
 }

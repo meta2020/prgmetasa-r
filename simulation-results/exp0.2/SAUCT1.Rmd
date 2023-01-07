@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = FALSE, fig.width = 12, fig.height = 5)
 options(knitr.kable.NA = '')
 library(knitr)
 library(kableExtra)
+library(tidyverse)
+
 ```
 
 Notation: 
@@ -21,7 +23,7 @@ Notation:
 - $X^{(s)}_i$: the biomarker measure of $i$th person in the $s$th study
 
 
-### 1 Samll HR
+# 1 Samll HR
 
 
 Simulation scenario 1
@@ -39,10 +41,14 @@ load("a-calc/beta_1_alpha_20.RData")
 # set$set1
 # p <- seq(0.8, 0.2, -0.2)
 
+dimname.sauc <- list(NULL, c("BNM.Pop", "BNM.Pub", "TNM.Prop"))
 # N=20 -------------------------------------------------------------------------
 
 load("N20/HR1_p0.8.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+sauc8 <- matrix(DATA[11,], ncol = 3, byrow = TRUE, 
+                dimnames = dimname.sauc)
+
 med8 <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv   <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv8  <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
@@ -55,6 +61,9 @@ rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "s
 
 load("N20/HR1_p0.6.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+sauc6 <- matrix(DATA[11,], ncol = 3, byrow = TRUE, 
+                dimnames = dimname.sauc)
+
 med6  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv6 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
@@ -67,6 +76,9 @@ rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "s
 
 load("N20/HR1_p0.4.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+sauc4 <- matrix(DATA[11,], ncol = 3, byrow = TRUE, 
+                dimnames = dimname.sauc)
+
 med4  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv4 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
@@ -79,6 +91,9 @@ rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "s
 
 load("N20/HR1_p0.2.RData")
 sauc <- matrix(DATA[11,], ncol = 3, byrow = TRUE)
+sauc2 <- matrix(DATA[11,], ncol = 3, byrow = TRUE, 
+                dimnames = dimname.sauc)
+
 med2  <- sapply(1:3, function(i) median(sauc[,i], na.rm = TRUE))
 cv  <- matrix(DATA[13,], ncol = 3, byrow = TRUE)
 cv2 <- sapply(1:3, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
@@ -89,10 +104,12 @@ MED <- apply(DATA, 1:2, function(x) median(x, na.rm = TRUE))
 rownames(MED) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b", "sauc", "S/N/p", "conv")
 # MED
 
-x1 <- rbind(med8, med6, med4, med2)
 
+x1 <- rbind(med8, med6, med4, med2)
 cr1 <- rbind(cv8, cv6, cv4, cv2)
 
+p <- rep(c("0.8(25)", "0.6(33)", "0.4(50)", "0.2(100)"), each = 1000)                  
+sauc.all1 <- cbind.data.frame(rbind.data.frame(sauc8, sauc6, sauc4, sauc2), p)
 
 # N=30 -------------------------------------------------------------------------
 
@@ -205,7 +222,30 @@ cr3 <- rbind(cv8, cv6, cv4, cv2)
 ```
 
 
+## Plot
+
 ```{r}
+
+## N = 20
+sauc.all1 %>% 
+  mutate(p = factor(p , levels=c("0.8(25)", "0.6(33)", "0.4(50)", "0.2(100)"))) %>% 
+  pivot_longer(cols = -p, names_to = "Model") %>% 
+  ggplot(aes(x = p, y = value, fill = Model)) + 
+  geom_boxplot(
+    notch=TRUE, notchwidth = 0.5, outlier.shape = NA, alpha = 0.7) +
+  scale_y_continuous(name = "SAUC", limits=c(0.6,0.9))+
+  scale_x_discrete(name = "p(S)")+
+  stat_summary(fun.y=mean, fun.args = list(na.rm = TRUE), 
+               geom="point", shape=18, size=2, color="red",
+             position = position_dodge2(width = 0.75, preserve = "single"))+
+  scale_fill_grey() +
+  theme_light() +
+  theme(legend.position = "none")
+  
+
+
+
+
 par(mfrow=c(1,3))
 
 matplot(x1, ylim = c(0.7, 0.9), type = "o", ylab = "Med(SAUC)", xlab = "p", xaxt = "n", pch = 1:3)
@@ -237,7 +277,7 @@ cr %>%
 
 ```
 
-### 2 Moderate HR
+# 2 Moderate HR
 
 Simulation scenario
 

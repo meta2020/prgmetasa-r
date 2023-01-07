@@ -68,7 +68,7 @@
   
  
   
-  s.l1 <- -0.5 * (sum(log.dev + y_Adj_y / det, na.rm = TRUE))
+  s.l1 <- 0.5 * (sum(log.dev + y_Adj_y / det, na.rm = TRUE))
 
-  -s.l1
+  return(s.l1)
 }

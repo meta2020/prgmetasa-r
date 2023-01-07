@@ -102,8 +102,7 @@ data <- data.3
   v23 <- data$v_spelnHR
 }
 
-# plogis(y1)
-# plogis(-y2)
+
 ```
 
 ## BNM Model of Hattori and Zhou
@@ -122,7 +121,7 @@ rownames(hes.bnm) <- colnames(hes.bnm) <- c("mu.se", "mu.sp", "tau.sp", "tau.sp"
 
 sauc.bnm <- SAUC.ci(par.bnm.ml, var.matrix = solve(hes.bnm), sauc.type = "sroc" )
 
-# sauc.bnm 
+sauc.bnm 
 
 ```
 
@@ -131,10 +130,37 @@ sauc.bnm <- SAUC.ci(par.bnm.ml, var.matrix = solve(hes.bnm), sauc.type = "sroc" 
 
 ```{r, fig.height=5, fig.width=5}
 
+## TNM MODEL (CHELESKEY DECOMPOSITION)
+
+y <- as.matrix( cbind(y1, y2, y3) )
+S <- as.matrix( cbind(v1, v12, v13, v2, v23, v3) )
+fit.tnm <- mixmeta(y, S, method = "ml")
+
+
+u0    <- fit.tnm$coefficients
+tau   <- c(fit.tnm$Psi)
+t1230 <- sqrt(tau[c(1, 5, 9)])
+r10   <- prod(tau[2]/prod(sqrt(tau[c(1, 5)])))
+r30   <- prod(tau[3]/prod(sqrt(tau[c(1, 9)])))
+r20   <- prod(tau[6]/prod(sqrt(tau[c(5, 9)])))
+
+
+par3 <- c(u0, t1230, r10, r20, r30)
+names(par3) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3")
+par3
+sauc3 <- SAUC(par3[c(1,2,4,5,7)])
+
+
 ## INITIAL VALUE
 
-init3 <- c(median(y1), median(y2), median(y3), 
-           median(v1), median(v2), median(v3), median(v12), median(v13), median(v23))
+init3 <- c(mean(y1), mean(y2), mean(y3), mean(v1), mean(v2), mean(v3), mean(v12), mean(v13), mean(v23))
+# fn.tnm.cho <- function(par) .llk.TNM.cho(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
+# fn.tnmcho <- nlminb(par3, fn.tnm.cho)
+# round(fn.tnmcho$par, 6)
+
+fn.tnm.ml <- function(par) .llk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
+fn.tnmml<- nlminb(par3, fn.tnm.ml)
+fn.tnmml$par
 
 PAR.O <- sapply(seq(1, 0.1, -0.1), function(p){
   
@@ -143,16 +169,16 @@ PAR.O <- sapply(seq(1, 0.1, -0.1), function(p){
                             a.interval= c(-10, 10)
                             )
 
-opt.o <- nlminb(c(init3, 1), fn.o,
+opt.o <- nlminb(c(par3, 1), fn.o,
               lower = c(rep(-Inf,3), rep(0,3),   rep(-1,3), 0),
-              upper = c(rep( Inf,3), rep(Inf,3), rep( 1,3), 2)
+              upper = c(rep( Inf,3), rep(Inf,3), rep( 1,3), 5)
               )
 
+# sauc <- SAUC(par = opt.o$par[c(1,2,4,5,7)])
 
 par <- c(opt.o$convergence, opt.o$par, plogis(opt.o$par[1:2]))
 names(par) <- c("conv", 
-                "mu.se", "mu.sp", "mu.lnhr", "tau.se", "tau.sp", "tau.lnhr", 
-                "rho1", "rho2", "rho3",
+                "mu.se", "mu.sp", "mu.lnhr", "tau.se", "tau.sp", "tau.lnhr", "rho1", "rho2", "rho3",
                 "beta",
                 "sen", "spe")
 par
@@ -161,8 +187,10 @@ par
 
 colnames(PAR.O) <- paste0("p=", seq(1, 0.1, -0.1))
 round(PAR.O, 3) %>%
-  kbl(caption ="Parameters from TNM") %>%
+  kbl(caption ="SAUC") %>%
   kable_classic_2(full_width = F)
+  # add_header_above(c(" "=1, rep(c("All \n studies" = 1, "Published \n studies" = 1, "Sensitivity \n analysis" = 1),3))) %>%
+  # add_header_above(c(" "=1, "N = 20" = 3, "N = 30" = 3, "N = 50" = 3))
 
 ```
 
@@ -177,7 +205,7 @@ sauc.sa <- sapply(seq(1, 0.1, -0.1), function(p){
                             a.interval= c(-10, 10)
                             )
 
-  opt.o <- nlminb(c(init3, 1), fn.o)
+  opt.o <- nlminb(c(par3, 1), fn.o)
 
 num.hessian <- numDeriv::hessian(fn.o, opt.o$par)
 rownames(num.hessian) <- colnames(num.hessian) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b")
@@ -193,7 +221,7 @@ c(sauc = sauc.ci, conv = opt.o$convergence)
 
 })
 
-sauc.mat.3 <- cbind(c(sauc.bnm, conv = opt.bnm.ml$convergence), sauc.sa[,-1])
+sauc.mat.3 <- cbind(c(sauc.bnm, conv = fn.tnmml$convergence), sauc.sa[,-1])
 colnames(sauc.mat.3) <- paste0("p=", seq(1, 0.1, -0.1))
 
 round(sauc.mat.3,3) %>%
@@ -229,7 +257,9 @@ names(par) <- c( "u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3",
              "b",
              "sauc", "sauc.lb", "sauc.ub",
              "sen", "spe", "conv")
+#par
 par.mvm.3 <- cbind(par.bnm.ml, par[c(1,2,4,5,7)])
+# par.mvm.3
 
 
 ```
@@ -283,10 +313,37 @@ sauc.bnm <- SAUC.ci(par.bnm.ml, var.matrix = solve(hes.bnm), sauc.type = "sroc" 
 
 ```{r, fig.height=5, fig.width=5}
 
+## TNM MODEL (CHELESKEY DECOMPOSITION)
+
+y <- as.matrix( cbind(y1, y2, y3) )
+S <- as.matrix( cbind(v1, v12, v13, v2, v23, v3) )
+fit.tnm <- mixmeta(y, S, method = "ml")
+
+
+u0    <- fit.tnm$coefficients
+tau   <- c(fit.tnm$Psi)
+t1230 <- sqrt(tau[c(1, 5, 9)])
+r10   <- prod(tau[2]/prod(sqrt(tau[c(1, 5)])))
+r30   <- prod(tau[3]/prod(sqrt(tau[c(1, 9)])))
+r20   <- prod(tau[6]/prod(sqrt(tau[c(5, 9)])))
+
+
+par3 <- c(u0, t1230, r10, r20, r30)
+names(par3) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3")
+# par3
+sauc3 <- SAUC(par3[c(1,2,4,5,7)])
+
+
 ## INITIAL VALUE
 
 init3 <- c(mean(y1), mean(y2), mean(y3), mean(v1), mean(v2), mean(v3), mean(v12), mean(v13), mean(v23))
+# fn.tnm.cho <- function(par) .llk.TNM.cho(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
+# fn.tnmcho <- nlminb(par3, fn.tnm.cho)
+# round(fn.tnmcho$par, 6)
 
+fn.tnm.ml <- function(par) .llk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23)
+fn.tnmml<- nlminb(par3, fn.tnm.ml)
+fn.tnmml$par
 
 PAR.O <- sapply(seq(1, 0.1, -0.1), function(p){
   
@@ -295,7 +352,7 @@ PAR.O <- sapply(seq(1, 0.1, -0.1), function(p){
                             a.interval= c(-10, 10)
                             )
 
-opt.o <- nlminb(c(init3, 1), fn.o)
+opt.o <- nlminb(c(par3, 1), fn.o)
 
 par <- c(opt.o$convergence, opt.o$par, plogis(opt.o$par[1:2]))
 names(par) <- c("conv", 
@@ -325,7 +382,7 @@ sauc.sa <- sapply(seq(1, 0.1, -0.1), function(p){
                             a.interval= c(-10, 10)
                             )
 
-  opt.o <- nlminb(c(init3, 1), fn.o)
+  opt.o <- nlminb(c(par3, 1), fn.o)
 
 num.hessian <- numDeriv::hessian(fn.o, opt.o$par)
 rownames(num.hessian) <- colnames(num.hessian) <- c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b")
@@ -341,7 +398,7 @@ c(sauc = sauc.ci, conv = opt.o$convergence)
 
 })
 
-sauc.mat.5 <- cbind(c(sauc.bnm, conv = opt.bnm.ml$convergence), sauc.sa[,-1])
+sauc.mat.5 <- cbind(c(sauc.bnm, conv = fn.tnmml$convergence), sauc.sa[,-1])
 colnames(sauc.mat.5) <- paste("p=",seq(1, 0.1, -0.1))
 
 round(sauc.mat.5,3)%>%

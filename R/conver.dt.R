@@ -61,7 +61,7 @@ convert.dt <- function(data, tK, study, ty, n1, n0, s1, s0, u_lnHR, v_lnHR, eta)
 			
 			study.i$inv.S0G  <- 1 / (study.i$s0^2 * study.i$G)
 			study.i$half.h0  <- c(0, diff(study.i$s0, lag = 1))/2
-			study.i$lag.sum0 <- c(0,head(study.i$inv.S0G, -1) + tail(study.i$inv.S0G, -1))
+			study.i$lag.sum0 <- c(0, head(study.i$inv.S0G, -1) + tail(study.i$inv.S0G, -1))
 			study.i$trapez0  <- study.i$lag.sum0 * study.i$half.h0
 			study.i$cum.sum0 <- cumsum(study.i$trapez0)
 			

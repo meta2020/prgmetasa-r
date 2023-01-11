@@ -16,7 +16,8 @@ library(tidyverse)
 library(ggpubr)
 rm(list = ls())
 load("a-calc/beta_1_alpha_20.RData")
-save.tex <- TRUE
+save.tex <- FALSE
+saveplot <- FALSE
 ```
 
 Notation: 
@@ -295,8 +296,13 @@ if (save.tex)  sink()
 # Plot all
 
 ```{r}
+if (saveplot) {setEPS(width = 9, height = 6); postscript("tsauc1.eps")}
+
 ggarrange(p1, p2, p3, p4, p5, p6, ncol = 3, nrow=2,labels = LETTERS[1:6],
           common.legend = TRUE, legend = "bottom",
           font.label = list(size = 12, face = "plain"))
+
+if(saveplot) dev.off()
+
 ```
 

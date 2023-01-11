@@ -9,7 +9,7 @@ SROC <- function(
 	par,  ## mu1 mu2 tau1 tau2 rho
 	sroc.type = c("sroc", "hsroc"),
 	add = FALSE,
-	ncols = NULL,
+	ncols = gray.colors(ncol(par), gamma = 1, start = 0, end = 0.8),
 	add.spoint=TRUE,
 	spoint.pch = 18,
 	spoint.cex = 2,

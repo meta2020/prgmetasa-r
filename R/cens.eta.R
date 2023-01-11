@@ -1,3 +1,10 @@
+##******************************************************************************
+##
+## PARAMETER IN G DISTRIBUTON
+##
+##******************************************************************************
+
+
 cens.eta <- function(data, med.year, n1, n0, s1_med, s0_med, eta.range = c(0,1), init.eta = 0.01){
 	
 	dt.mct <- data.frame(n1 = eval(substitute(n1), data), 

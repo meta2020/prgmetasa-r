@@ -149,8 +149,8 @@ convert.dt <- function(data, tK, study, ty, n1, n0, s1, s0, u_lnHR, v_lnHR, eta)
 			study.i$trapez1  <- study.i$lag.sum * study.i$half.h1
 			study.i$cum.sum0 <- cumsum(study.i$trapez0)
 			study.i$cum.sum1 <- cumsum(study.i$trapez1)
-			int0 <- 	study.i[pos.t, "cum.sum0"]
-			int1 <- 	study.i[pos.t, "cum.sum1"]
+			int0             <- study.i[pos.t, "cum.sum0"]
+			int1             <- study.i[pos.t, "cum.sum1"]
 			
 			c(i, int1, int0)
 			

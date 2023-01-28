@@ -5,7 +5,7 @@
 ##******************************************************************************
 
 
-.llk.TNM.ml <- function(par, y1, y2, y3, v1, v2, v3, v12, v13, v23){
+llk.TNM.ml <- function(par, y1, y2, y3, v1, v2, v3, v12, v13, v23){
 
   u1 <- par[1]      ## logit-se
   u2 <- par[2]      ## logit-sp

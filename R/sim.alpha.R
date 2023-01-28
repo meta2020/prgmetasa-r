@@ -32,6 +32,6 @@ sim.alpha <- function(
   ## 2. CALCULATE a ----
   
   fa <- function(a) mean(pnorm(a + b*dataSt.p$t_lnHR)) - p
-  uniroot(fa, c(-10, 10), extendInt="yes")$root
+  uniroot(fa, c(-10, 10), extendInt="no")$root
 
 }

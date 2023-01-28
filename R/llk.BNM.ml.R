@@ -5,7 +5,7 @@
 ##******************************************************************************
 
 
-.llk.BNM.ml <- function(par,y1, y2, v1, v2, v12){
+llk.BNM.ml <- function(par,y1, y2, v1, v2, v12){
 
   u1 <- par[1]
   u2 <- par[2]
@@ -28,7 +28,7 @@
   ##  LOGLIKELIHOOD-1 OF y|Sigma ----
   ##
 
-  det.vec <- (v11)*(v22)-v12^2
+  det.vec <- v11 * v22 -v12^2
 
   log.det.vec <- suppressWarnings(log(det.vec))
 

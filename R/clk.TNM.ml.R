@@ -4,8 +4,7 @@
 ##
 ##******************************************************************************
 
-
-.clk.TNM.ml <- function(
+clk.TNM.ml <- function(
   par, y1, y2, y3,
   v1, v2, v3, v12, v13, v23,
   p, a.interval
@@ -25,6 +24,7 @@
   r3  <- par[9]      ## ln-HR
   
   b   <- par[10] 
+  # b <- 1
 
   t11 <- t1^2
   t22 <- t2^2
@@ -42,7 +42,7 @@
   v13 <- v13 + t13
   v23 <- v23 + t23
 
-  t_lnHR   <- y3/sqrt(v3)
+  t_lnHR   <- abs(y3/sqrt(v3))
 
   ##
   ## FUNCTOIN b(Sigma) ----
@@ -60,10 +60,12 @@
   ##
   ## FIND THE ROOT OF a = a.opt ----
   ##
+  
+  n <- length(y1)
 
-  a.p <- function(a) {mean(1/f.b(a), na.rm = TRUE) - 1/p}
+  a.p <- function(a) {sum(1/f.b(a), na.rm = TRUE) - n/p}
 
-  a.opt.try <- suppressWarnings(try(uniroot(a.p, a.interval, extendInt="yes"), silent = TRUE)) 
+  a.opt.try <- suppressWarnings(try(uniroot(a.p, a.interval, extendInt="no"), silent = TRUE)) 
 
   a.opt <- a.opt.try$root
 

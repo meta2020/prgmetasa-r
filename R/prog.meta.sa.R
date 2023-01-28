@@ -10,7 +10,7 @@ progmeta.sa <- function(
 
 p <- p
 
-fn.o <- function(par) .clk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23,
+fn.o <- function(par) clk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23,
                                   p = p, 
                                   a.interval= a.interval
 )

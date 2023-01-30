@@ -3,7 +3,7 @@
 
 progmeta.sa <- function(
     y1, y2, y3, v1, v2, v3, v12, v13, v23, 
-    p, init,
+    p, 
     sauc.type = "sroc",
     a.interval= c(-10, 10)
     ){
@@ -17,8 +17,8 @@ fn.o <- function(par) clk.TNM.ml(par, y1, y2, y3, v1, v2, v3, v12, v13, v23,
 
 eps <- sqrt(.Machine$double.eps)
 
-opt.o <- nlminb(c(init,1), fn.o,
-                lower = c(rep(-Inf,3), rep(eps,3), rep(-1,3), eps ),
+opt.o <- nlminb(c(rep(0.1,9), 0.5), fn.o,
+                lower = c(rep(-Inf,3), rep(0,3), rep(-1,3), 0 ),
                 upper = c(rep( Inf,3), rep(Inf,3), rep( 1,3), 2))
 
 if(p == 1) {

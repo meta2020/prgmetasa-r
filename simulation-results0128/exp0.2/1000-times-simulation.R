@@ -49,43 +49,60 @@ ptdis <- "ptdis1"
 load(sprintf("a-calc/beta%s_pts%s_%s.RData", b0, pts.dist[1], pts.dist[2]))
 
 N <- 20
-## BIOMARKER 1----
-alpha <- rev(set$alpha1)
-mk <- set$mk1
-hr <- "HR1"
-source("loop-hr-correct.R")
+# ## BIOMARKER 1----
+# alpha <- rev(set$alpha1)
+# mk <- set$mk1
+# hr <- "HR1"
+# source("loop-hr-correct.R")
+# 
+# ## BIOMARKER 2----
+# alpha <- rev(set$alpha2)
+# mk <- set$mk2
+# hr <- "HR2"
+# source("loop-hr-correct.R")
 
-## BIOMARKER 2----
-alpha <- rev(set$alpha2)
-mk <- set$mk2
-hr <- "HR2"
+## BIOMARKER 3----
+alpha <- rev(set$alpha3)
+mk <- set$mk3
+hr <- "HR3"
 source("loop-hr-correct.R")
 
 N <- 30
-## BIOMARKER 1----
-alpha <- rev(set$alpha1)
-mk <- set$mk1
-hr <- "HR1"
-source("loop-hr-correct.R")
+# ## BIOMARKER 1----
+# alpha <- rev(set$alpha1)
+# mk <- set$mk1
+# hr <- "HR1"
+# source("loop-hr-correct.R")
+# 
+# ## BIOMARKER 2----
+# alpha <- rev(set$alpha2)
+# mk <- set$mk2
+# hr <- "HR2"
+# source("loop-hr-correct.R")
 
-## BIOMARKER 2----
-alpha <- rev(set$alpha2)
-mk <- set$mk2
-hr <- "HR2"
+## BIOMARKER 3----
+alpha <- rev(set$alpha3)
+mk <- set$mk3
+hr <- "HR3"
 source("loop-hr-correct.R")
-
 
 N <- 50
-## BIOMARKER 1----
-alpha <- rev(set$alpha1)
-mk <- set$mk1
-hr <- "HR1"
-source("loop-hr-correct.R")
+# ## BIOMARKER 1----
+# alpha <- rev(set$alpha1)
+# mk <- set$mk1
+# hr <- "HR1"
+# source("loop-hr-correct.R")
+# 
+# ## BIOMARKER 2----
+# alpha <- rev(set$alpha2)
+# mk <- set$mk2
+# hr <- "HR2"
+# source("loop-hr-correct.R")
 
-## BIOMARKER 2----
-alpha <- rev(set$alpha2)
-mk <- set$mk2
-hr <- "HR2"
+## BIOMARKER 3----
+alpha <- rev(set$alpha3)
+mk <- set$mk3
+hr <- "HR3"
 source("loop-hr-correct.R")
 
 ##******************************************************************************
@@ -111,6 +128,12 @@ mk <- set$mk2
 hr <- "HR2"
 source("loop-hr-correct.R")
 
+## BIOMARKER 3----
+alpha <- rev(set$alpha3)
+mk <- set$mk3
+hr <- "HR3"
+source("loop-hr-correct.R")
+
 N <- 30
 ## BIOMARKER 1----
 alpha <- rev(set$alpha1)
@@ -124,6 +147,11 @@ mk <- set$mk2
 hr <- "HR2"
 source("loop-hr-correct.R")
 
+## BIOMARKER 3----
+alpha <- rev(set$alpha3)
+mk <- set$mk3
+hr <- "HR3"
+source("loop-hr-correct.R")
 
 N <- 50
 ## BIOMARKER 1----
@@ -136,6 +164,12 @@ source("loop-hr-correct.R")
 alpha <- rev(set$alpha2)
 mk <- set$mk2
 hr <- "HR2"
+source("loop-hr-correct.R")
+
+## BIOMARKER 3----
+alpha <- rev(set$alpha3)
+mk <- set$mk3
+hr <- "HR3"
 source("loop-hr-correct.R")
 
 

@@ -29,3 +29,17 @@ v.i <- rnorm(n.i, mean = 0.5, sd = v.sd)
 plot(density(X1), xlim = c(-2,3))
 lines(density(X2))
 lines(density(v.i))
+
+
+x1.u <- 0.8; x1.s <- 0.1
+x2.u <- 0.2; x2.s <- 0.3
+v.sd <- 0.05
+
+X1 <- x1.u + x1.s*rlogis(n.i)
+X2 <- x2.u + x2.s*rlogis(n.i)
+
+v.i <- rnorm(n.i, mean = 0.5, sd = v.sd)
+
+plot(density(X1), xlim = c(-2,3))
+lines(density(X2))
+lines(density(v.i))

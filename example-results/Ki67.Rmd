@@ -24,7 +24,7 @@ library(kableExtra)
 library(latex2exp)
 library(numDeriv)
 
-saveplot <- TRUE
+saveplot <- FALSE
 
 ```
 
@@ -58,6 +58,16 @@ dataHR$v_lnHR <- se^2
 
 ## MERGED DATA (OS+HR)
 os_hr <- merge(os.data, dataHR, all.x = TRUE)
+
+## lnHR
+dataHRALL <-read_excel("Ki67.xlsx", sheet = "HR_all")
+dataHRALL$u_lnHR <- log(dataHRALL$HR)
+ln_ci.low   <- log(dataHRALL$ci.low)
+ln_ci.up    <- log(dataHRALL$ci.up)
+se          <- (ln_ci.up - ln_ci.low)/(2 * qnorm(0.975))
+dataHRALL$v_lnHR <- se^2
+dataHRALL$t_lnHR <- dataHRALL$u_lnHR/se
+t0 <- dataHRALL$t_lnHR[dataHRALL$D==0]
 
 ## THE NUMBER OF UNIQUE DATA
 # length(unique(os_hr$study))
@@ -358,7 +368,9 @@ curve(pnorm(beta1*x + alpha1), -10, 15, ylim = c(0,1), xlim = c(-3,7),
 curve(pnorm(beta2*x + alpha2), -5, 10, add = TRUE, col=2) 
 curve(pnorm(beta3*x + alpha3), -5, 10, add = TRUE, col=3)
 axis(2, at=c(0,0.5,1), labels = c(0,0.5,1))
-points(x, rep(0,   length(x)), pch="|", col=1, cex = 1)
+points(x, rep(1,   length(x)), pch="|", col=1, cex = 1)
+points(t0, rep(0,   length(t0)), pch="|", col=1, cex = 1)
+
 title("t = 3 (year)")
 legend("topleft", 
        bty='n',
@@ -385,7 +397,9 @@ curve(pnorm(beta1*x + alpha1), -5, 10, ylim = c(0,1), xlim = c(-3,7),
 curve(pnorm(beta2*x + alpha2), -5, 10, add = TRUE, col=2) 
 curve(pnorm(beta3*x + alpha3), -5, 10, add = TRUE, col=3)
 axis(2, at=c(0,0.5,1), labels = c(0,0.5,1))
-points(x, rep(0,   length(x)), pch="|", col=1, cex = 1)
+points(x, rep(1, length(x)), pch="|", col=1, cex = 1)
+points(t0, rep(0, length(t0)), pch="|", col=1, cex = 1)
+
 title("t = 5 (year)")
 legend("topleft", 
        bty='n',
@@ -401,4 +415,6 @@ par(mfrow = c(1,1))
 
 if(saveplot) dev.off()
 ```
+
+
 

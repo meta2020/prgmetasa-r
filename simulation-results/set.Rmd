@@ -1,0 +1,81 @@
+---
+title: 'The scenarios of Exp(0.2) and "U(1,4)'
+author: "Yi"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+options(knitr.kable.NA = '')
+rm(list = ls())
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+
+```
+
+```{r}
+alpha <- NULL
+load("exp0.2/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, rev(set$alpha1)[c(7,5,3)])
+load("exp0.2/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, rev(set$alpha1)[c(7,5,3)])
+
+load("exp0.2/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, rev(set$alpha2)[c(7,5,3)])
+load("exp0.2/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, rev(set$alpha2)[c(7,5,3)])
+
+load("U14/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, rev(set$alpha1)[c(7,5,3)])
+load("U14/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, rev(set$alpha1)[c(7,5,3)])
+
+load("U14/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, rev(set$alpha2)[c(7,5,3)])
+load("U14/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, rev(set$alpha2)[c(7,5,3)])
+
+set.tab <- data.frame(
+	CD = c("$Exp(0.2)$", rep(NA,3), "$U(1,4)$", rep(NA,3)),
+	MK = rep(c(1,NA, 2, NA), 2),
+	PD = rep(c("$U(50,150)$", "$U(50,300)$"), 4),
+	beta = rep(1,8),
+	alpha
+)
+
+rownames(set.tab) <- NULL
+colnames(set.tab) <- c("Censoring", "Biomarker", "Subjects", 
+																							"$\\beta$", "$\\alpha_{0.7}$", "$\\alpha_{0.5}$", "$\\alpha_{0.3}$")
+
+sink("TB-SET.tex")
+
+set.tab%>%
+  kbl(
+    caption="Scenarios of simulation",
+    format ="latex",
+    # format = ifelse(save.tex, "latex", "html"),
+    # format = "latex",
+    longtable = F, 
+    booktabs = T,
+    linesep = c(rep('',3), '\\addlinespace'),
+    align = "r",
+    position = "!htb",
+    escape = FALSE,
+    label = "set")
+# %>%
+#   footnote(general = "
+# 			$\\alpha_p$ denotes $\\alpha$ calculated given overall selection probability 0.7, 0.5, 0.3", 
+#    escape = FALSE, 
+# 			threeparttable = TRUE,  
+# 			general_title = "")
+
+sink()
+
+```
+

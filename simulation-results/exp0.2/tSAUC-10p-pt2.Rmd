@@ -1,0 +1,310 @@
+---
+title: "Simulation Result 1: Exp(0.2), 5 methods comparison"
+subtile: "pt distribution U(50, 150)"
+author: "Yi"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+options(knitr.kable.NA = '')
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+library(wrapr)
+library(ggplot2)
+library(gridExtra)
+
+rm(list = ls())
+
+```
+
+```{r}
+load("a-calc/beta1_pts50_300.RData")
+set
+```
+
+
+```{r, include=FALSE}
+dimname.sauc <- list(NULL, c("M1BNM.P", "M2BNM.O", "M3TNM.P", "M4TNM.O","M5TNM.Prop"))
+dimname.par <- list(
+  c("mu1", "mu2", "mu3", "tau1", "tau2", "tau3", "rho1", "rho2", "rho3", 
+      "beta", "alpha","S","N","prop","sauc","nc"), 
+  c("M1BNM.P", "M2BNM.O", "M3TNM.P", "M4TNM.O","M5TNM.Prop"))
+dimname.sauc.med <- list(c("M1BNM.P", "M2BNM.O", "M3TNM.P", "M4TNM.O","M5TNM.Prop"), 
+                         c("Median (Q1, Q3)"))
+dimname.sauc.msd <- list(c("M1BNM.P", "M2BNM.O", "M3TNM.P", "M4TNM.O","M5TNM.Prop"), 
+                         c("Mean (SD)"))
+
+result_list <- function(path = "N30/ptdis1_HR1_p0.1.RData", only.conv = TRUE){ 
+
+  load(path)
+  if(only.conv){
+    
+    nconv <- DATA[16,]!=0
+    DATA[1:15, nconv] <- NA
+    
+  }
+  ncv <- sum(!complete.cases(DATA[1,]))
+  
+  sauc.val <- matrix(DATA[15,], ncol = 5, byrow = TRUE, 
+                  dimnames = dimname.sauc)
+  
+  ## convergence rate
+  cv   <- matrix(DATA[16,], ncol = 5, byrow = TRUE)
+  cv.sum  <- sapply(1:5, function(i) sum(1-cv[,i], na.rm = TRUE)/10)
+  
+  # MED pf pars
+  dim(DATA) <- c(16, 5, dim(DATA)[2]/5)
+  med <- apply(DATA, 1:2, function(x) median(x, na.rm = TRUE))
+  q1  <- apply(DATA, 1:2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))
+  q3  <- apply(DATA, 1:2, function(x) quantile(x, probs = 0.75, na.rm = TRUE))
+  
+  mean <- apply(DATA, 1:2, function(x) mean(x, na.rm = TRUE))
+  sd   <- apply(DATA, 1:2, function(x) sd(x, na.rm = TRUE))
+  
+  par.med.q13 <- matrix(sprintf("%.2f (%.2f, %.2f)", med, q1, q3), 16,5, 
+                        dimnames = dimname.par)[c(1:11),]
+  sauc.med.q13 <- matrix(sprintf("%.2f (%.2f, %.2f)", med*100, q1*100, q3*100), 16,5, 
+                        dimnames = dimname.par)[c(15),]
+  par.mean.sd <- matrix(sprintf("%.2f (%.2f)", mean, sd), 16,5,
+                        dimnames = dimname.par)[-c(1:11, 15),]
+  hr.mean <- matrix(sprintf("%.2f (%.2f)", mean, sd), 16,5,
+                        dimnames = dimname.par)[3,3]
+
+  
+  return(list(sauc.val = sauc.val, 
+              cv.sum= cv.sum, 
+              par.mean.sd = par.mean.sd,
+              par.med.q13 = par.med.q13, 
+              sauc.med.q13 = sauc.med.q13,
+  												hr = hr.mean,
+              rm.ncv = ncv))
+}
+```
+
+
+```{r, include=FALSE}
+grp.bp <- function(
+    data1, data2, data3, data4, data5, data6, data7, data8, data9,
+    pS.lab,
+    title = "N = 30",
+    ylim = c(0, 1)){
+  
+data11 <- data.frame(data1$sauc.val, p = rep(pS.lab[1], nrow(data1$sauc.val)))
+data22 <- data.frame(data2$sauc.val, p = rep(pS.lab[2], nrow(data2$sauc.val)))
+data33 <- data.frame(data3$sauc.val, p = rep(pS.lab[3], nrow(data3$sauc.val)))
+data44 <- data.frame(data4$sauc.val, p = rep(pS.lab[4], nrow(data4$sauc.val)))
+data55 <- data.frame(data5$sauc.val, p = rep(pS.lab[5], nrow(data5$sauc.val)))
+data66 <- data.frame(data6$sauc.val, p = rep(pS.lab[6], nrow(data6$sauc.val)))
+data77 <- data.frame(data7$sauc.val, p = rep(pS.lab[7], nrow(data7$sauc.val)))
+data88 <- data.frame(data8$sauc.val, p = rep(pS.lab[8], nrow(data8$sauc.val)))
+data99 <- data.frame(data9$sauc.val, p = rep(pS.lab[9], nrow(data9$sauc.val)))
+
+sauc <- rbind.data.frame(data11, data22, data33, data44, data55,
+                         data66, data77, data88, data99)
+
+sauc %>% 
+  mutate(p = factor(p , levels=c(pS.lab))) %>% 
+  pivot_longer(cols = -p, names_to = "Model") %>% 
+  ggplot(aes(x = p, y = value, fill = Model)) + 
+  geom_boxplot(notch=FALSE, notchwidth = 0.5, outlier.shape = NA, alpha = 0.7) +
+  scale_y_continuous(name = "SAUC", limits=ylim)+
+  scale_x_discrete(name = "p(S)")+
+  # stat_summary(fun="mean", fun.args = list(na.rm = TRUE), 
+  #              geom="point", shape=18, size=2, color="red",
+  #            position = position_dodge2(width = 0.75, preserve = "single"))+
+  ggtitle(title) +
+  scale_fill_grey() +
+  theme_light() +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, face="plain", size =11))
+  # geom_hline(yintercept=median(data1$sauc.val[,1], na.rm = TRUE)) +
+  # geom_hline(yintercept=median(data1$sauc.val[,3], na.rm = TRUE))
+  
+}
+
+```
+
+
+
+```{r, include=FALSE}
+## PT DISTRIBUTION 1 ----
+
+## OBJECT NAME EXAMPLE: N20.D2.HR1.P0.8
+
+for(N in c("N20", "N30", "N50")){
+	
+	for(ptdist in 2){
+		
+		for(HR in 1:2){
+			
+			for(p in seq(0.9, 0.1, -0.1)) {
+				
+				assign(paste0(N, ".D", ptdist, ".HR", HR, ".P", p), 
+											result_list(paste0(N, "/ptdis", ptdist, "_HR", HR, "_p", p, ".RData")) )
+			}
+		}
+	}
+}
+
+
+```
+
+
+## Plot
+
+```{r, fig.width=12, fig.height=12}
+
+p1.1 <- grp.bp(N20.D2.HR1.P0.9, N20.D2.HR1.P0.9, N20.D2.HR1.P0.7, N20.D2.HR1.P0.6, 
+													N20.D2.HR1.P0.5, N20.D2.HR1.P0.4, N20.D2.HR1.P0.3, N20.D2.HR1.P0.2, N20.D2.HR1.P0.1,
+             pS.lab = as.character(seq(0.9, 0.1, -0.1)), 
+             title = "N = 50, HR1", ylim = c(0,1))
+
+p1.2 <- grp.bp(N20.D2.HR2.P0.9, N20.D2.HR2.P0.9, N20.D2.HR2.P0.7, N20.D2.HR2.P0.6, 
+													N20.D2.HR2.P0.5, N20.D2.HR2.P0.4, N20.D2.HR2.P0.3, N20.D2.HR2.P0.2, N20.D2.HR2.P0.1,
+             pS.lab = as.character(seq(0.9, 0.1, -0.1)), 
+             title = "N = 50, HR2", ylim = c(0,1))
+
+
+
+p2.1 <- grp.bp(N30.D2.HR1.P0.9, N30.D2.HR1.P0.9, N30.D2.HR1.P0.7, N30.D2.HR1.P0.6, 
+													N30.D2.HR1.P0.5, N30.D2.HR1.P0.4, N30.D2.HR1.P0.3, N30.D2.HR1.P0.2, N30.D2.HR1.P0.1,
+             pS.lab = as.character(seq(0.9, 0.1, -0.1)), 
+             title = "N = 30, HR1", ylim = c(0,1))
+
+p2.2 <- grp.bp(N30.D2.HR2.P0.9, N30.D2.HR2.P0.9, N30.D2.HR2.P0.7, N30.D2.HR2.P0.6, 
+													N30.D2.HR2.P0.5, N30.D2.HR2.P0.4, N30.D2.HR2.P0.3, N30.D2.HR2.P0.2, N30.D2.HR2.P0.1,
+             pS.lab = as.character(seq(0.9, 0.1, -0.1)), 
+             title = "N = 30, HR2", ylim = c(0,1))
+
+
+
+p3.1 <- grp.bp(N50.D2.HR1.P0.9, N50.D2.HR1.P0.9, N50.D2.HR1.P0.7, N50.D2.HR1.P0.6, 
+													N50.D2.HR1.P0.5, N50.D2.HR1.P0.4, N50.D2.HR1.P0.3, N50.D2.HR1.P0.2, N50.D2.HR1.P0.1,
+             pS.lab = as.character(seq(0.9, 0.1, -0.1)), 
+             title = "N = 50, HR1", ylim = c(0,1))
+
+p3.2 <- grp.bp(N50.D2.HR2.P0.9, N50.D2.HR2.P0.9, N50.D2.HR2.P0.7, N50.D2.HR2.P0.6, 
+													N50.D2.HR2.P0.5, N50.D2.HR2.P0.4, N50.D2.HR2.P0.3, N50.D2.HR2.P0.2, N50.D2.HR2.P0.1,
+             pS.lab = as.character(seq(0.9, 0.1, -0.1)), 
+             title = "N = 50, HR2", ylim = c(0,1))
+
+
+
+
+grid.arrange(
+	p1.1,p1.2,
+	p2.1,p2.2,
+	p3.1,p3.2,
+	nrow=3)
+
+
+```
+
+
+## SAUC Table
+
+```{r}
+sauc.mq.20 <- cbind.data.frame(
+  N = c(20, NA, NA, NA, NA),
+  Methods = c("BNM$_P$", "BNM$_O$", "TNM$_P$", "TNM$_O$", "Prop"),
+  N20.D2.HR1.P0.9$sauc.med.q13, N20.D2.HR1.P0.8$sauc.med.q13, N20.D2.HR1.P0.7$sauc.med.q13,
+  N20.D2.HR1.P0.6$sauc.med.q13, N20.D2.HR1.P0.5$sauc.med.q13, N20.D2.HR1.P0.4$sauc.med.q13, 
+  N20.D2.HR1.P0.3$sauc.med.q13, N20.D2.HR1.P0.2$sauc.med.q13, N20.D2.HR1.P0.1$sauc.med.q13)
+
+sauc.mq.20.2 <- cbind.data.frame(
+  N = c(20, NA, NA, NA, NA),
+  Methods = c("BNM$_P$", "BNM$_O$", "TNM$_P$", "TNM$_O$", "Prop"),
+  N20.D2.HR2.P0.9$sauc.med.q13, N20.D2.HR2.P0.8$sauc.med.q13, N20.D2.HR1.P0.7$sauc.med.q13,
+  N20.D2.HR2.P0.6$sauc.med.q13, N20.D2.HR2.P0.5$sauc.med.q13, N20.D2.HR1.P0.4$sauc.med.q13, 
+  N20.D2.HR2.P0.3$sauc.med.q13, N20.D2.HR2.P0.2$sauc.med.q13, N20.D2.HR1.P0.1$sauc.med.q13)
+
+
+
+sauc.mq.20 #%>%kbl(format = "html")
+sauc.mq.20.2
+
+
+sauc.mq.30 <- cbind.data.frame(
+  N = c(30, NA, NA, NA, NA),
+  Methods = c("BNM$_P$", "BNM$_O$", "TNM$_P$", "TNM$_O$", "Prop"),
+  N30.D2.HR1.P0.9$sauc.med.q13, N30.D2.HR1.P0.8$sauc.med.q13, N30.D2.HR1.P0.7$sauc.med.q13,
+  N30.D2.HR1.P0.6$sauc.med.q13, N30.D2.HR1.P0.5$sauc.med.q13, N30.D2.HR1.P0.4$sauc.med.q13, 
+  N30.D2.HR1.P0.3$sauc.med.q13, N30.D2.HR1.P0.2$sauc.med.q13, N30.D2.HR1.P0.1$sauc.med.q13)
+
+sauc.mq.30.2 <- cbind.data.frame(
+  N = c(30, NA, NA, NA, NA),
+  Methods = c("BNM$_P$", "BNM$_O$", "TNM$_P$", "TNM$_O$", "Prop"),
+  N30.D2.HR2.P0.9$sauc.med.q13, N30.D2.HR2.P0.8$sauc.med.q13, N30.D2.HR2.P0.7$sauc.med.q13,
+  N30.D2.HR2.P0.6$sauc.med.q13, N30.D2.HR2.P0.5$sauc.med.q13, N30.D2.HR2.P0.4$sauc.med.q13, 
+  N30.D2.HR2.P0.3$sauc.med.q13, N30.D2.HR2.P0.2$sauc.med.q13, N30.D2.HR2.P0.1$sauc.med.q13)
+
+
+sauc.mq.30
+sauc.mq.30.2
+
+sauc.mq.50 <- cbind.data.frame(
+  N = c(50, NA, NA, NA, NA),
+  Methods = c("BNM$_P$", "BNM$_O$", "TNM$_P$", "TNM$_O$", "Prop"),
+  N50.D2.HR1.P0.9$sauc.med.q13, N50.D2.HR1.P0.8$sauc.med.q13, N50.D2.HR1.P0.7$sauc.med.q13,
+  N50.D2.HR1.P0.6$sauc.med.q13, N50.D2.HR1.P0.5$sauc.med.q13, N50.D2.HR1.P0.4$sauc.med.q13, 
+  N50.D2.HR1.P0.3$sauc.med.q13, N50.D2.HR1.P0.2$sauc.med.q13, N50.D2.HR1.P0.1$sauc.med.q13)
+
+sauc.mq.50.2 <- cbind.data.frame(
+  N = c(50, NA, NA, NA, NA),
+  Methods = c("BNM$_P$", "BNM$_O$", "TNM$_P$", "TNM$_O$", "Prop"),
+  N50.D2.HR2.P0.9$sauc.med.q13, N50.D2.HR2.P0.8$sauc.med.q13, N50.D2.HR2.P0.7$sauc.med.q13,
+  N50.D2.HR2.P0.6$sauc.med.q13, N50.D2.HR2.P0.5$sauc.med.q13, N50.D2.HR2.P0.4$sauc.med.q13, 
+  N50.D2.HR2.P0.3$sauc.med.q13, N50.D2.HR2.P0.2$sauc.med.q13, N50.D2.HR2.P0.1$sauc.med.q13)
+
+
+sauc.mq.50
+sauc.mq.50.2
+
+```
+
+
+
+
+```{r}
+hr.20 <- data.frame(
+	N20.D2.HR1.P0.9$hr, N20.D2.HR1.P0.8$hr, N20.D2.HR1.P0.7$hr,
+ N20.D2.HR1.P0.6$hr, N20.D2.HR1.P0.5$hr, N20.D2.HR1.P0.4$hr, 
+ N20.D2.HR1.P0.3$hr, N20.D2.HR1.P0.2$hr, N20.D2.HR1.P0.1$hr)
+
+hr.20.2 <- data.frame(
+	N20.D2.HR2.P0.9$hr, N20.D2.HR2.P0.8$hr, N20.D2.HR2.P0.7$hr,
+ N20.D2.HR2.P0.6$hr, N20.D2.HR2.P0.5$hr, N20.D2.HR2.P0.4$hr, 
+ N20.D2.HR2.P0.3$hr, N20.D2.HR2.P0.2$hr, N20.D2.HR2.P0.1$hr)
+
+hr.30 <- data.frame(
+	N30.D2.HR1.P0.9$hr, N30.D2.HR1.P0.8$hr, N30.D2.HR1.P0.7$hr,
+ N30.D2.HR1.P0.6$hr, N30.D2.HR1.P0.5$hr, N30.D2.HR1.P0.4$hr, 
+ N30.D2.HR1.P0.3$hr, N30.D2.HR1.P0.2$hr, N30.D2.HR1.P0.1$hr)
+
+hr.30.2 <- data.frame(
+	N30.D2.HR2.P0.9$hr, N30.D2.HR2.P0.8$hr, N30.D2.HR2.P0.7$hr,
+ N30.D2.HR2.P0.6$hr, N30.D2.HR2.P0.5$hr, N30.D2.HR2.P0.4$hr, 
+ N30.D2.HR2.P0.3$hr, N30.D2.HR2.P0.2$hr, N30.D2.HR2.P0.1$hr)
+
+hr.50 <- data.frame(
+	N50.D2.HR1.P0.9$hr, N50.D2.HR1.P0.8$hr, N50.D2.HR1.P0.7$hr,
+ N50.D2.HR1.P0.6$hr, N50.D2.HR1.P0.5$hr, N50.D2.HR1.P0.4$hr, 
+ N50.D2.HR1.P0.3$hr, N50.D2.HR1.P0.2$hr, N50.D2.HR1.P0.1$hr)
+
+hr.50.2 <- data.frame(
+	N50.D2.HR2.P0.9$hr, N50.D2.HR2.P0.8$hr, N50.D2.HR2.P0.7$hr,
+ N50.D2.HR2.P0.6$hr, N50.D2.HR2.P0.5$hr, N50.D2.HR2.P0.4$hr, 
+ N50.D2.HR2.P0.3$hr, N50.D2.HR2.P0.2$hr, N50.D2.HR2.P0.1$hr)
+
+
+hr.20
+hr.20.2
+hr.30
+hr.30.2
+hr.50
+hr.50.2
+```

@@ -20,6 +20,9 @@ rm(list = ls())
 save.tex <- T
 ```
 
+These are the results without removing the non-converged estimates.
+
+"Suc" indicates the percentage of getting estimates (both converged and non-converged) successfully among 1000 repeat. 
 
 
 ```{r, include=FALSE}
@@ -34,7 +37,7 @@ dimname.cr   <- list(c("M1BNM.P", "M2BNM.O", "M3TNM.P", "M4TNM.O","M5TNM.Prop"),
 
 result_list <- function(path = "exp0.2/N20/ptdis2_HR1_p0.8.RData", 
                         dnm.cr = dimname.cr, dnm.sauc = dimname.sauc,
-                        only.conv = TRUE){ 
+                        only.conv = FALSE){ 
 
   load(path)
   if(only.conv){
@@ -50,6 +53,7 @@ result_list <- function(path = "exp0.2/N20/ptdis2_HR1_p0.8.RData",
   
   # MED pf sauc
   sauc.val <- matrix(DATA[15,], ncol = 5, byrow = TRUE)
+  succ <- nrow(sauc.val)/10
   
   med <- apply(sauc.val, 2, function(x) median(x, na.rm = TRUE))*100
   q1  <- apply(sauc.val, 2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))*100
@@ -58,7 +62,7 @@ result_list <- function(path = "exp0.2/N20/ptdis2_HR1_p0.8.RData",
   sauc.med.q13 <- matrix(sprintf("%.2f (%.2f, %.2f)", med, q1, q3), 5,1, dimnames = dnm.sauc)
 
   
-  return(list(sauc.med.q13 = sauc.med.q13, cr = cr.sum))
+  return(list(sauc.med.q13 = sauc.med.q13, cr = succ))
 }
 ```
 
@@ -109,7 +113,7 @@ tsauc.tab <- function(FD, N, ptdist, HR, p1=0.7, p2=0.5, p3=0.3){
 	P3 = get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p3) )$sauc.med.q13,
 	CR3= get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p3) )$cr 
 	)[c(1,2,5),]
-colnames(sauc) <- c("N", "Method", rep(c("Median (Q1, Q3)", "CR"),3))
+colnames(sauc) <- c("N", "Method", rep(c("Median (Q1, Q3)", "Suc"),3))
 
 return(sauc)
 }

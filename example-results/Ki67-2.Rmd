@@ -15,15 +15,16 @@ rm(list = ls())
 
 
 ```{r, include=FALSE}
-files.sources <- list.files(path = "../R/")
-x <- sapply(paste0("../R/", files.sources), source)
+files.sources <- list.files(path = "R/")
+x <- sapply(paste0("R/", files.sources), source)
+options(knitr.kable.NA = '')
 library(readxl)
 library(knitr)
 library(kableExtra)
 library(latex2exp)
 library(numDeriv)
 
-saveplot <- FALSE
+saveplot <- T
 
 ```
 
@@ -98,39 +99,26 @@ library(meta)
 # metabias(mt, plotit = TRUE, method.bias = "Egger")
 # funnel(mt)
 
-if (saveplot) {setEPS(width = 12, height = 4); postscript("ki67-tf.eps")}
+if (saveplot) {setEPS(width = 12, height = 6); postscript("ki67-tf.eps")}
 
-par(mfrow = c(1,3))
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.1,]), slab=author)
+par(mfrow = c(1,2))
+res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.1 & dataHRALL$D==1,]), slab=author)
 res.tf <- trimfill(res)
-funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE)
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
 title("Cutoff = 10%")
 title("(A)", adj = 0, font.main = 1, cex.main = 1)
 
 
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff>0.1 & dataHRALL$cutoff<=0.2,]), slab=author)
+res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.2 & dataHRALL$D==1,]), slab=author)
 res.tf <- trimfill(res)
-funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE)
-title("10% < Cutoff <= 20")
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
+title("Cutoff = 20%")
 title("(B)", adj = 0, font.main = 1, cex.main = 1)
-
-
-plot(t1, rep(1,   length(t1.t3)), pch="|", col=1, cex = 1, ylim = c(0,1), xlim = c(-3,7),
-					xlab = "t-statistic", ylab = "Probability of publication", yaxt='n')
-axis(2, at=c(0,1), labels = c("Unpublished", "Published"))
-points(t0, rep(0.95,   length(t0.t3)), pch="|", col="darkgrey", cex = 1)
-legend("bottomleft", 
-       bty='n',
-       legend = c("Published and reported KM estimates", "Published but no KM estimates"), 
-       col = c("black", "darkgrey"), cex = 1, 
-       lty = rep(1,2))
-title("(C)", adj = 0, font.main = 1, cex.main = 1)
-title("The t-statistic of 38 published studies")
-
+par(mfrow = c(1,1))
 
 if(saveplot) dev.off()
 
-par(mfrow = c(1,1))
+
 
 ```
 
@@ -206,15 +194,11 @@ rownames(PAR.all) <- c(paste0("mu",1:3), paste0("tau",1:3), paste0("rho",1:3), "
 ## OUTPUT1: SAUC
 par.sauc <- PAR.all[c(12:14),]
 
-# round(sauc.mat,3) %>%
-#   kbl(caption ="SAUC") %>%
-#   kable_classic_2(full_width = F)
-
 ## OUTPUT2: PAR
-par.sroc <- PAR.all[c(1,2,4,5,7), c(1, 4,6,8)]  ##p = 0.7, 0.5, 0.3
+par.sroc <- PAR.all[c(1,2,4,5,7), c(1, 5,7,9)]  ##p = 0.6, 0.4, 0.2
 
 ## OUTPUT3: ALPHA, BETA
-par.ab <- PAR.all[c(10,11),c(4,6,8)] 
+par.ab <- PAR.all[c(10,11),c(5,7,9)] 
 
 res <- list(data = data, 
 												par.all = PAR.all, par.sroc= par.sroc, par.sauc = par.sauc, par.ab=par.ab)
@@ -235,21 +219,21 @@ res5 <- output.result(TK=5)
 
 ```{r table1}
 sroc.tab <- function(res = res3, 
-																					cap ="Estimates of the parameters for the SROC curve at $t=3$",
-																					lab = "sroc-ki67-3"){
+                     cap ="Estimates of the parameters for the SROC curve at $t=3$",
+                     lab = "sroc-ki67-3"){
 	
 
-TB1 <- t(round(res$par.all, 3)[c(1:11),c(1,4,6,8)])
+TB1 <- t(round(res$par.all, 3)[c(1:11),c(1,5,7,9)])
 TB1.c1 <- sprintf("%.3f (%.3f)", TB1[,1], plogis(TB1[,1]))
 TB1.c2 <- sprintf("%.3f (%.3f)", TB1[,2], plogis(TB1[,2]))
 TB1.c3 <- sprintf("%.3f (%.3f)", TB1[,3], exp(TB1[,3]))
 TB1.fn <- cbind(TB1.c1, TB1.c2, TB1.c3, TB1[,-c(1:3)])
 TB1.fn[1,3] <- NA
 header <- c("",
-		"$\\mu_\\mathrm{sen}$ (sen)", "$\\mu_\\mathrm{spe}$ (sen)","$\\mu_\\mathrm{lnHR}$ (HR)",
-		"$\\psi_\\mathrm{sen}$", "$\\psi_\\mathrm{spe}$", "$\\psi_\\mathrm{lnHR}$",
+		"$\\mu_\\mathrm{se}$ (se)", "$\\mu_\\mathrm{sp}$ (sp)","$\\mu_\\mathrm{lnHR}$ (HR)",
+		"$\\psi_\\mathrm{se}$", "$\\psi_\\mathrm{sp}$", "$\\psi_\\mathrm{lnHR}$",
 		"$\\rho_1$", "$\\rho_2$", "$\\rho_3$", "$\\beta$", "$\\alpha$")
-col0 <- c("HZ", "Prop ($p=0.7$)", "Prop ($p=0.5$)", "Prop ($p=0.3$)")
+col0 <- c("HZ", " $p=0.6$", "$p=0.4$", "$p=0.2$")
 TB1.fn <- cbind(col0, TB1.fn)
 rownames(TB1.fn) <- NULL
 colnames(TB1.fn) <- header
@@ -277,13 +261,13 @@ output <- TB1.fn %>%
 return(output)
 }
 
-sink("SROC-ki67-3.tex")
-sroc.tab(res = res3, cap ="Estimates of the parameters for the SROC curve at $t=3$", lab = "sroc-ki67-3")
-sink()
+if (saveplot) sink("SROC-ki67-3.tex")
+sroc.tab(res = res3, cap ="Estimates of the other parameters for the SROC$(3)$", lab = "sroc-ki67-3")
+if (saveplot) sink()
 
-sink("SROC-ki67-5.tex")
-sroc.tab(res = res5, cap ="Estimates of the parameters for the SROC curve at $t=5$", lab = "sroc-ki67-5")
-sink()
+if (saveplot) sink("SROC-ki67-5.tex")
+sroc.tab(res = res5, cap ="Estimates of the other parameters for the SROC$(5)$", lab = "sroc-ki67-5")
+if (saveplot) sink()
 
 ```
 
@@ -298,18 +282,18 @@ TB5 <- t(round(res5$par.all, 3)[12:14,])
 sauc5 <- sprintf("%.3f (%.3f, %.3f)", TB5[,1], TB5[,2], TB5[,3])
 col0 <- c("SAUC (95\\% CI)")
 
-col <- c("HZ", "$p=0.9", "$p=0.8", "$p=0.7", "$p=0.6", "$p=0.5",
-									"$p=0.4", "$p=0.3", "$p=0.2", "$p=0.1")
+col <- c("HZ", "$p=0.9$", "$p=0.8$", "$p=0.7$", "$p=0.6$", "$p=0.5$",
+									"$p=0.4$", "$p=0.3$", "$p=0.2$", "$p=0.1$")
 TB <- cbind(col, sauc3, sauc5)
 
 rownames(TB) <- NULL
 colnames(TB) <- c("","SAUC(3) (95\\% CI)", "SAUC(5) (95\\% CI)")
 
-sink("SAUC-ki67.tex")
+if (saveplot) sink("SAUC-ki67.tex")
 
 TB %>%
   kbl(
-    caption="The estimated SAUC with 95\\% condifence intervals at $t=3$ and $t=5$",
+    caption="The estimated SAUC$(t)$ with 95\\% condifence intervals at $t=3,5$",
     format ="latex",
     # format = ifelse(save.tex, "latex", "html"),
     # format = "latex",
@@ -323,7 +307,7 @@ TB %>%
     label = "sauc-ki67") 
 # %>%  add_header_above(c("","HZ", paste0("p =", seq(0.9, 0.1, -0.1))),escape = FALSE) 
 
-sink()
+if (saveplot) sink()
 
 
 ```
@@ -333,7 +317,7 @@ sink()
 
 
 ```{r SAUC, fig.height=8, fig.width=12}
-saveplot <- FALSE
+
 if (saveplot) {setEPS(width = 12, height = 8); postscript("ki67.eps")}
 title.cex <- 1.2
 
@@ -345,11 +329,11 @@ points(plogis(-res3$data$u_spe), plogis(res3$data$u_sen))
 legend("bottomright", 
        bty='n',
        legend = c(sprintf("HZ, SAUC = %.3f", res3$par.sauc[1,1]), 
-       											sprintf("p = %.2f, SAUC = %.3f", c(0.7, 0.5, 0.3), c(res3$par.sauc[1,c(4,6,8)]))), 
+                  sprintf("p = %.2f, SAUC = %.3f", c(0.6, 0.4, 0.2), c(res3$par.sauc[1,c(5,7,9)]))), 
        col = gray.colors(4, gamma = 1, start = 0, end = 0.8), 
        pch = 18, pt.cex = 1.5, cex = 1.5, 
        lty = rep(1,2))
-title("t = 3 (year)")
+title("t = 3")
 title("(A)", adj = 0, font.main = 1, cex.main = title.cex)
 
 
@@ -358,11 +342,11 @@ points(plogis(-res5$data$u_spe), plogis(res5$data$u_sen))
 legend("bottomright", 
        bty='n',
        legend = c(sprintf("HZ, SAUC = %.3f", res5$par.sauc[1,1]), 
-       											sprintf("p = %.2f, SAUC = %.3f", c(0.7, 0.5, 0.3), c(res5$par.sauc[1,c(4,6,8)]))), 
+                  sprintf("p = %.2f, SAUC = %.3f", c(0.6, 0.4, 0.2), c(res5$par.sauc[1,c(5,7,9)]))), 
        col = gray.colors(4, gamma = 1, start = 0, end = 0.8), 
        pch = 18, pt.cex = 1.5, cex = 1.5, 
        lty = rep(1,2))
-title("t = 5 (year)")
+title("t = 5")
 title("(D)", adj = 0, font.main = 1, cex.main = title.cex)
 
 
@@ -371,7 +355,7 @@ matplot(y = t(res3$par.sauc), ylim = c(0.5,0.8), type = "b",
         pch = 20, col = c("black","darkgrey","darkgrey"), 
 								lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
 axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
-title("t = 3 (year)")
+title("t = 3")
 legend("bottomleft", 
        bty='n',
        legend = c("SAUC", "95% CI"), 
@@ -384,7 +368,7 @@ matplot(y = t(res3$par.sauc), ylim = c(0.5,0.8), type = "b",
         pch = 20, col = c("black","darkgrey","darkgrey"), 
 								lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
 axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
-title("t = 5 (year)")
+title("t = 5")
 legend("bottomleft", 
        bty='n',
        legend = c("SAUC", "95% CI"), 
@@ -410,12 +394,12 @@ curve(pnorm(beta1*x + alpha1), -10, 15, ylim = c(0,1), xlim = c(-3,7),
 curve(pnorm(beta2*x + alpha2), -5, 10, add = TRUE, col=2) 
 curve(pnorm(beta3*x + alpha3), -5, 10, add = TRUE, col=3)
 axis(2, at=c(0,0.5,1), labels = c(0,0.5,1))
-points(t1.t3, rep(1,   length(t1.t3)), pch="|", col=1, cex = 1)
-points(t0.t3, rep(0.95,   length(t0.t3)), pch="|", col="darkgrey", cex = 1)
-title("t = 3 (year)")
+# points(t1.t3, rep(1,   length(t1.t3)), pch="|", col=1, cex = 1)
+points(t0.t3, rep(1,   length(t0.t3)), pch="|", col="black", cex = 1)
+title("t = 3")
 legend("bottomright", 
        bty='n',
-       legend = TeX(sprintf("$p = %.1f$", c(0.7,0.5,0.3))), 
+       legend = TeX(sprintf("$p = %.1f$", c(0.6, 0.4, 0.2))), 
        col = 1:3, cex = 1.5, 
        lty = rep(1,3))
 title("(C)", adj = 0, font.main = 1, cex.main = title.cex)
@@ -438,13 +422,13 @@ curve(pnorm(beta1*x + alpha1), -5, 10, ylim = c(0,1), xlim = c(-3,7),
 curve(pnorm(beta2*x + alpha2), -5, 10, add = TRUE, col=2) 
 curve(pnorm(beta3*x + alpha3), -5, 10, add = TRUE, col=3)
 axis(2, at=c(0,0.5,1), labels = c(0,0.5,1))
-points(t1.t5, rep(1, length(t1.t5)), pch="|", col=1, cex = 1)
-points(t0.t5, rep(0.95, length(t0.t5)), pch="|", col="darkgrey", cex = 1)
+# points(t1.t5, rep(1, length(t1.t5)), pch="|", col=1, cex = 1)
+points(t0.t5, rep(1, length(t0.t5)), pch="|", col="black", cex = 1)
 # abline(h=0.5, col = "grey", lty=2)
-title("t = 5 (year)")
+title("t = 5")
 legend("bottomright", 
        bty='n',
-       legend = TeX(sprintf("$p = %.1f$", c(0.7,0.5,0.3))), 
+       legend = TeX(sprintf("$p = %.1f$",c(0.6, 0.4, 0.2))), 
        col = 1:3, cex = 1.5, 
        lty = rep(1,3))
 title("(F)", adj = 0, font.main = 1, cex.main = title.cex)

@@ -1,6 +1,6 @@
 
 
-for(p in seq(0.9, 0.1, -0.1)){
+for(p in c(0.7, 0.5, 0.3)){
 S0 <- round(N/p)
 DATA <- foreach(r = 1:rep, .combine = "cbind", .packages = c("survival"), .errorhandling = "remove")  %dorng%  {  # 
   

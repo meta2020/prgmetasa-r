@@ -1,9 +1,12 @@
 ---
 title: 'Simulation Result 1: C~Exp(0.2)'
+subtitle: "Convergence rate, removed non-converged results"
 author: "Yi"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
+  html_document:
+    df_print: paged
 editor_options:
   chunk_output_type: console
 ---
@@ -17,8 +20,14 @@ library(tidyverse)
 
 # library(ggpubr)
 rm(list = ls())
-save.tex <- T
+save.tex <- F
 ```
+
+- Prop$_n$: initial values are $(0,0,0, 0.1,0.1,0.1, -0.1,-0.1,-0.1$
+
+- Prop$_o$: initial values are the MLE from trivariate normal using published studies
+
+- Prop$_p$: initial values are the MLE from trivariate normal using population studies
 
 
 
@@ -26,13 +35,13 @@ save.tex <- T
 
 ## FUNCTION FOR CREATING OBJECT
 
-dimname.sauc <- list(c("M1BNM.P", "M2BNM.O", "M3TNM.P", "M4TNM.O","M5TNM.Prop"), "tSAUC")
-dimname.cr   <- list(c("M1BNM.P", "M2BNM.O", "M3TNM.P", "M4TNM.O","M5TNM.Prop"), "CR")
+dimname.sauc <- list(c("M1BNM.P", "M2BNM.O", "M3TNM.Prop1","M4TNM.Prop2", "M5TNM.Prop3"), "SAUC")
+dimname.cr   <- list(c("M1BNM.P", "M2BNM.O", "M3TNM.Prop1","M4TNM.Prop2", "M5TNM.Prop3"), "CR")
 
 # dimname.par <- list(c("u1", "u2", "u3", "t1", "t2", "t3", "r1", "r2", "r3", "b"), c("BNM.Pop", "BNM.Pub", "TNM.Prop"))
 # dimname.sauc.med <- list(c("BNM.Pop", "BNM.Pub", "TNM.Prop"), c("Median (Q1, Q3)"))
 
-result_list <- function(path = "exp0.2/N20/ptdis2_HR1_p0.8.RData", 
+result_list <- function(path = "exp0.2/N20/ptdis2_HR1_p0.7.RData", 
                         dnm.cr = dimname.cr, dnm.sauc = dimname.sauc,
                         only.conv = TRUE){ 
 
@@ -45,13 +54,17 @@ result_list <- function(path = "exp0.2/N20/ptdis2_HR1_p0.8.RData",
   }
   
   ## convergence rate
-  cr   <- matrix(DATA[16,], ncol = 5, byrow = TRUE)
-  cr.sum  <- matrix(sapply(1:5, function(i) round(sum(1-cr[,i], na.rm = TRUE)/10,2)),5,1, dimnames = dnm.cr)
+  cr.id <- as.numeric(DATA[16,]==0)  ## converge is TRUE
+  cr   <- matrix(cr.id, ncol = 5, byrow = TRUE)
+  cr.sum  <- matrix(sapply(1:5, function(i) round(mean(cr[,i], na.rm = TRUE)*100,2)),5,1, dimnames = dnm.cr)
   
   # MED pf sauc
   sauc.val <- matrix(DATA[15,], ncol = 5, byrow = TRUE)
+  succ <- nrow(sauc.val)/10
   
   med <- apply(sauc.val, 2, function(x) median(x, na.rm = TRUE))*100
+  med <- med-med[1]
+
   q1  <- apply(sauc.val, 2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))*100
   q3  <- apply(sauc.val, 2, function(x) quantile(x, probs = 0.75, na.rm = TRUE))*100
   
@@ -101,14 +114,14 @@ tsauc.tab <- function(FD, N, ptdist, HR, p1=0.7, p2=0.5, p3=0.3){
 	
 	sauc <- data.frame(
 	NN = c(N, rep(NA, 4)),
- Methods = c("HZ$_P$", "HZ$_O$","TNM$_P$", "TNM$_O$", "Prop"),
+ Methods = c("HZ$_P$", "HZ$_O$","Prop$_n$","Prop$_o$","Prop$_p$"),
  P1 = get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p1) )$sauc.med.q13, 
 	CR1= get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p1) )$cr, 
 	P2 = get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p2) )$sauc.med.q13, 
 	CR2= get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p2) )$cr, 
 	P3 = get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p3) )$sauc.med.q13,
 	CR3= get(paste0("F", FD, ".N", N, ".D", ptdist, ".HR", HR, ".P", p3) )$cr 
-	)[c(1,2,5),]
+	)
 colnames(sauc) <- c("N", "Method", rep(c("Median (Q1, Q3)", "CR"),3))
 
 return(sauc)
@@ -140,14 +153,14 @@ rownames(DT.MK1) <- NULL
 output <- DT.MK1 %>%
   kbl(
     caption=cap,
-    format =fmt,
+    # format =fmt,
     # format = ifelse(save.tex, "latex", "html"),
-    # format = "latex",
+    format = "latex",
     longtable = F, 
     booktabs = T,
     align = "r",
     position = "!htb",
-    linesep = c(rep('',2), '\\addlinespace'),
+    linesep = c(rep('',4), '\\addlinespace'),
     escape = FALSE,
     label = tb.lab,) %>%
   add_header_above(c(rep("",3), "$p = 0.7$"=2, "$p = 0.5$"=2, "$p = 0.3$"=2),escape = FALSE) %>%

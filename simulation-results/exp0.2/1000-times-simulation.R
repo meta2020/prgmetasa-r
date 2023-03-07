@@ -16,8 +16,8 @@
   library(testit)
   ## LOAD FUNCTIONS
   
-  files.sources <- list.files(path = "../../R/")
-  x <- sapply(paste0("../../R/", files.sources), source)
+  files.sources <- list.files(path = "../R/")
+  x <- sapply(paste0("../R/", files.sources), source)
   rep <- 1000
 
 }

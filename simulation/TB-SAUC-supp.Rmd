@@ -1,0 +1,382 @@
+---
+title: 'Simulation Result for Manuscript'
+author: "Yi"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  latex_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+options(knitr.kable.NA = '')
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+
+# library(ggpubr)
+rm(list = ls())
+save.tex <- F
+load("exp0.2/a-calc/beta1_pts50_150.RData")
+```
+
+\begin{equation*}
+\begin{aligned}
+\mathrm{Biomarker1}:\tilde X = 
+\left\{\begin{matrix}
+`r set$mk1[1]`+`r set$mk1[3]`e &\mathrm{if~} \tilde T\le2
+\\ 
+`r set$mk1[2]`+`r set$mk1[4]`e &\mathrm{if~} \tilde T>2
+\end{matrix}\right.
+\end{aligned} 
+\end{equation*}
+\begin{equation*}
+\begin{aligned}
+\mathrm{Biomarker2}:\tilde X = 
+\left\{\begin{matrix}
+`r set$mk2[1]`+`r set$mk2[3]`e &\mathrm{if~} \tilde T\le2
+\\ 
+`r set$mk2[2]`+`r set$mk2[4]`e &\mathrm{if~} \tilde T>2
+\end{matrix}\right.
+\end{aligned} 
+\end{equation*}
+
+
+
+```{r}
+
+alpha <- NULL
+load("exp0.2/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, set$alpha1)
+load("exp0.2/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, set$alpha1)
+
+load("exp0.2/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, set$alpha2)
+load("exp0.2/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, set$alpha2)
+
+load("U14/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, set$alpha1)
+load("U14/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, set$alpha1)
+
+load("U14/a-calc/beta1_pts50_150.RData")
+alpha <- rbind(alpha, set$alpha2)
+load("U14/a-calc/beta1_pts50_300.RData")
+alpha <- rbind(alpha, set$alpha2)
+
+set.tab <- data.frame(
+	CD = c("$Exp(0.2)$", rep(NA,3), "$U(1,4)$", rep(NA,3)),
+	MK = rep(c(1,NA, 2, NA), 2),
+	PD = rep(c("$U(50,150)$", "$U(50,300)$"), 4),
+	beta = rep(1,8),
+	alpha
+)
+
+rownames(set.tab) <- NULL
+colnames(set.tab) <- c("Censoring", "Biomarker", "Subjects", 
+																							"$\\beta$", "$\\alpha_{0.7}$", "$\\alpha_{0.5}$", "$\\alpha_{0.3}$")
+
+set.tab%>%
+  kbl(
+    caption="Scenarios of simulation",
+    format ="latex",
+    longtable = F, 
+    booktabs = T,
+    linesep = c(rep('',3), '\\addlinespace'),
+    align = "r",
+    position = "!htb",
+    escape = FALSE,
+    label = "set")
+```
+
+
+
+
+```{r func1, include=FALSE}
+
+## FUNCTION FOR CREATING OBJECT
+
+mtd.name <- c("BNM.P", "TNM.P", paste0(rep(c("BNM.O", "TNM.O", "SA.o", "SA.p", "SA.n"),3),rep(c(7,5,3), each=5)))
+dimname.sauc <- list("SAUC", mtd.name)
+dimname.cr <- list("CR", mtd.name)
+dimname.sn <- list("S", mtd.name)
+
+result_list <- function(path = "exp0.2/S70/ptdis1_HR2.RData", only.conv = TRUE){ 
+
+  load(path)
+  if(only.conv){
+    
+    nconv <- DATA[11,]!=0
+    DATA[1:10, nconv] <- NA
+    
+  }
+  
+  ##
+  SN <- colMeans(matrix(DATA[14, ], ncol = 17, byrow = TRUE), na.rm=TRUE)
+  dim(SN) <- c(1, 17)
+  dimnames(SN) <- dimname.sn
+  SS <- sprintf("%.f", SN)
+  
+  
+  ## convergence rate
+  cr  <- round(colMeans(matrix(DATA[11, ]==0, ncol = 17, byrow = TRUE), na.rm=TRUE)*100,2)
+  dim(cr) <- c(1, 17)
+  dimnames(cr) <- dimname.cr
+  
+  # MED pf sauc
+  sauc <- matrix(DATA[10,], ncol = 17, byrow = TRUE)
+  succ <- nrow(sauc)/10
+  
+  med <- apply(sauc, 2, function(x) median(x, na.rm = TRUE))*100
+  med <- med-med[1]
+  q1  <- apply(sauc, 2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))*100
+  q3  <- apply(sauc, 2, function(x) quantile(x, probs = 0.75, na.rm = TRUE))*100
+  
+  sauc.med.q13 <- sprintf("%.2f (%.2f, %.2f)", med, q1, q3)
+  dim(sauc.med.q13) <- c(1, 17)
+  dimnames(sauc.med.q13) <- dimname.sauc
+  
+  
+  
+  res <- t(rbind(SS, sauc.med.q13, cr)[,-c(2,4,7,9,12,14,17)])
+  res[-1,1] <- ""
+  
+  return(res)
+}
+```
+
+
+
+
+```{r, include=FALSE}
+
+## CREATE OBJECT
+## OBJECT NAME EXAMPLE: N20.D1.HR1.P0.8
+
+for(folder in c("exp0.2/", "U14/")){
+	
+	for(S in c("S70", "S200")){
+	
+	for(ptdist in 1:2){
+		
+		for(HR in 1:2){
+			
+				if (folder=="exp0.2/") fd <- "F1." else fd <- "F2."
+				assign(paste0(fd, S, ".D", ptdist, ".HR", HR), 
+											result_list(paste0(folder, S, "/ptdis", ptdist, "_HR", HR, ".RData")) )
+		}
+	}
+}
+	
+}
+
+
+```
+
+
+
+
+```{r}
+## FUNCTION FOR CREATING SMALL TABLES
+
+sauc11 <- rbind.data.frame(
+	F1.S70.D1.HR1, 
+	F1.S200.D1.HR1
+	)
+colnames(sauc11) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+sauc12 <- rbind.data.frame(
+	F1.S70.D2.HR1, 
+	F1.S200.D2.HR1
+	)
+colnames(sauc12) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+sauc21 <- rbind.data.frame(
+	F1.S70.D1.HR2, 
+	F1.S200.D1.HR2
+	)
+colnames(sauc21) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+sauc22 <- rbind.data.frame(
+	F1.S70.D2.HR2, 
+	F1.S200.D2.HR2
+	)
+colnames(sauc22) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+
+tab <- cbind(sauc11, sauc21)
+
+medq <- tab[,-c(1,4)]
+S <- tab[,1]
+Patients1 <- c("50-150", rep("", length(S)-1))  #, "50-300", rep("", 25))
+Methods <- rep(c(
+  "HZ$_P$", 
+  "HZ$_O$","Prop$_{(0.7)}$", "Prop$_{(0.7)}^*$",
+  "HZ$_O$","Prop$_{(0.5)}$", "Prop$_{(0.5)}^*$",
+  "HZ$_O$","Prop$_{(0.3)}$", "Prop$_{(0.3)}^*$"),2)
+P <- rep(c("", "0.7", rep("", 2), "0.5", rep("", 2), "0.3", rep("", 2)),2)
+tab1 <- cbind(
+  Patients1, S, P, Methods, medq
+)
+  
+colnames(tab1) <- c("Patients","S", "$p$", "Methods", 
+                    "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
+rownames(tab1) <- NULL
+
+ftnote <- "
+  Patients denote the range of the number of patients.
+  $S$ denotes the number of the population studies.
+  $p$ denotes the approximate proportion of the published studies among the population.
+	Median with 25th and 75th empirical quartiles (Q1, Q3) of the SAUC at $t=2$ are reported. 
+	CR denotes the proportion of successfully convergenced estimates among 1000 repetition.
+	HZ$_P$ denotes the HZ model using the population studies; 
+	HZ$_O$ denotes the HZ model using only the corresponding numbers of published studies;
+	Prop$_{(p)}$ denotes the proposed sensitivity analysis method given $p$ with initial values equal to the etimates from the trivariate normal model based on the published studies;
+	Prop$_{(p)}^*$ denotes the proposed method given $p$ with initial values equal to the etimates from the trivariate normal model based on the population studies.
+	The medians are multiplied by 100."
+
+tab1 %>%
+  kbl(
+    caption="Summary of the estimated SAUC when the true censoring is distributed as $Exp(0.2)$.",
+    format = "latex",
+    longtable = F, 
+    booktabs = T,
+    align = "r",
+    position = "!htb",
+    linesep = c('\\addlinespace',rep(c(rep('',2), '\\addlinespace'),3)),
+    escape = FALSE,
+    label = "supp-tab1",) %>%
+  add_header_above(c(rep("",4), "Biomarker1"=2, "Biomarker2"=2),escape = FALSE) %>%
+  footnote(general = ftnote, 
+   escape = FALSE, 
+			threeparttable = TRUE,  
+			general_title = "")
+
+
+tab <- cbind(sauc12, sauc22)
+
+medq <- tab[,-c(1,4)]
+S <- tab[,1]
+Patients2 <- c("50-300", rep("", length(S)-1))
+tab2 <- cbind(
+  Patients2, S, P, Methods, medq
+)
+  
+colnames(tab2) <- c("Patients","S", "$p$", "Methods", 
+                    "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
+rownames(tab2) <- NULL
+
+
+tab2 %>%
+  kbl(
+    caption="Summary of the estimated SAUC when the true censoring is distributed as $Exp(0.2)$.",
+    format = "latex",
+    longtable = F, 
+    booktabs = T,
+    align = "r",
+    position = "!htb",
+    linesep = c('\\addlinespace',rep(c(rep('',2), '\\addlinespace'),3)),
+    escape = FALSE,
+    label = "supp-tab2",) %>%
+  add_header_above(c(rep("",4), "Biomarker1"=2, "Biomarker2"=2),escape = FALSE) %>%
+  footnote(general = ftnote, 
+   escape = FALSE, 
+			threeparttable = TRUE,  
+			general_title = "")
+```
+
+
+```{r}
+
+sauc11 <- rbind.data.frame(
+	F2.S70.D1.HR1,
+	F2.S200.D1.HR1
+	)
+colnames(sauc11) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+sauc12 <- rbind.data.frame(
+	F2.S70.D2.HR1,
+	F2.S200.D2.HR1
+	)
+colnames(sauc12) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+sauc21 <- rbind.data.frame(
+	F2.S70.D1.HR2,
+	F2.S200.D1.HR2
+	)
+colnames(sauc21) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+sauc22 <- rbind.data.frame(
+	F2.S70.D2.HR2,
+	F2.S200.D2.HR2
+	)
+colnames(sauc22) <- c("S", c("Median (Q1, Q3)", "CR"))
+
+
+tab <- cbind(sauc11, sauc21)
+
+medq <- tab[,-c(1,4)]
+S <- tab[,1]
+tab1 <- cbind(
+  Patients1, S, P, Methods, medq
+)
+  
+colnames(tab1) <- c("Patients","S", "$p$", "Methods", 
+                    "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
+rownames(tab1) <- NULL
+
+
+tab1 %>%
+  kbl(
+    caption="Summary of the estimated SAUC when the true censoring is distributed as $U(1,4)$, but a misspecified exponential distribution is fitted.",
+    format = "latex",
+    longtable = F, 
+    booktabs = T,
+    align = "r",
+    position = "!htb",
+    linesep = c('\\addlinespace',rep(c(rep('',2), '\\addlinespace'),3)),
+    escape = FALSE,
+    label = "supp-tab3",) %>%
+  add_header_above(c(rep("",4), "Biomarker1"=2, "Biomarker2"=2),escape = FALSE) %>%
+  footnote(general = ftnote, 
+   escape = FALSE, 
+			threeparttable = TRUE,  
+			general_title = "")
+
+
+tab <- cbind(sauc12, sauc22)
+
+medq <- tab[,-c(1,4)]
+S <- tab[,1]
+tab2 <- cbind(
+  Patients2, S, P, Methods, medq
+)
+  
+colnames(tab2) <- c("Patients","S", "$p$", "Methods", 
+                    "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
+rownames(tab2) <- NULL
+
+
+tab2 %>%
+  kbl(
+    caption="Summary of the estimated SAUC when the true censoring is distributed as $U(1,4)$, but a misspecified exponential distribution is fitted.",
+    format = "latex",
+    longtable = F, 
+    booktabs = T,
+    align = "r",
+    position = "!htb",
+    linesep = c('\\addlinespace',rep(c(rep('',2), '\\addlinespace'),3)),
+    escape = FALSE,
+    label = "supp-tab4",) %>%
+  add_header_above(c(rep("",4), "Biomarker1"=2, "Biomarker2"=2),escape = FALSE) %>%
+  footnote(general = ftnote, 
+   escape = FALSE, 
+			threeparttable = TRUE,  
+			general_title = "")
+```
+

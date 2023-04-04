@@ -80,6 +80,7 @@ set.tab <- data.frame(
 rownames(set.tab) <- NULL
 colnames(set.tab) <- c("Censoring", "Biomarker", "Subjects", 
 																							"$\\beta$", "$\\alpha_{0.7}$", "$\\alpha_{0.5}$", "$\\alpha_{0.3}$")
+if (save.tex) sink("TB-SET.tex")
 
 set.tab%>%
   kbl(
@@ -92,6 +93,8 @@ set.tab%>%
     position = "!htb",
     escape = FALSE,
     label = "set")
+if (save.tex) sink()
+
 ```
 
 
@@ -133,7 +136,7 @@ result_list <- function(path = "exp0.2/S70/ptdis1_HR2.RData", only.conv = TRUE){
   succ <- nrow(sauc)/10
   
   med <- apply(sauc, 2, function(x) median(x, na.rm = TRUE))*100
-  med <- med-med[1]
+  # med <- (med-med[1])
   q1  <- apply(sauc, 2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))*100
   q3  <- apply(sauc, 2, function(x) quantile(x, probs = 0.75, na.rm = TRUE))*100
   
@@ -240,6 +243,7 @@ ftnote <- "
 	Prop$_{(p)}^*$ denotes the proposed method given $p$ with initial values equal to the etimates from the trivariate normal model based on the population studies.
 	The medians are multiplied by 100."
 
+if (save.tex) sink("TB-SAUC-EXP1-SUPP.tex")
 tab1 %>%
   kbl(
     caption="Summary of the estimated SAUC when the true censoring is distributed as $Exp(0.2)$.",
@@ -256,6 +260,7 @@ tab1 %>%
    escape = FALSE, 
 			threeparttable = TRUE,  
 			general_title = "")
+if (save.tex) sink()
 
 
 tab <- cbind(sauc12, sauc22)
@@ -271,6 +276,7 @@ colnames(tab2) <- c("Patients","S", "$p$", "Methods",
                     "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
 rownames(tab2) <- NULL
 
+if (save.tex) sink("TB-SAUC-EXP2-SUPP.tex")
 
 tab2 %>%
   kbl(
@@ -288,6 +294,8 @@ tab2 %>%
    escape = FALSE, 
 			threeparttable = TRUE,  
 			general_title = "")
+if (save.tex) sink()
+
 ```
 
 
@@ -330,6 +338,7 @@ colnames(tab1) <- c("Patients","S", "$p$", "Methods",
                     "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
 rownames(tab1) <- NULL
 
+if (save.tex) sink("TB-SAUC-UNIF1-SUPP.tex")
 
 tab1 %>%
   kbl(
@@ -347,6 +356,7 @@ tab1 %>%
    escape = FALSE, 
 			threeparttable = TRUE,  
 			general_title = "")
+if (save.tex) sink()
 
 
 tab <- cbind(sauc12, sauc22)
@@ -361,6 +371,7 @@ colnames(tab2) <- c("Patients","S", "$p$", "Methods",
                     "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
 rownames(tab2) <- NULL
 
+if (save.tex) sink("TB-SAUC-UNIF2-SUPP.tex")
 
 tab2 %>%
   kbl(
@@ -378,5 +389,7 @@ tab2 %>%
    escape = FALSE, 
 			threeparttable = TRUE,  
 			general_title = "")
+if (save.tex) sink()
+
 ```
 

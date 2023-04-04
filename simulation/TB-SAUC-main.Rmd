@@ -19,7 +19,7 @@ library(tidyverse)
 
 # library(ggpubr)
 rm(list = ls())
-save.tex <- F
+save.tex <- T
 load("exp0.2/a-calc/beta1_pts50_150.RData")
 
 ```
@@ -134,7 +134,7 @@ result_list <- function(path = "exp0.2/S70/ptdis1_HR2.RData", only.conv = T){
   succ <- nrow(sauc)/10
   
   med <- apply(sauc, 2, function(x) median(x, na.rm = TRUE))*100
-  med <- med-med[1]
+  # med <- med-med[1]
   q1  <- apply(sauc, 2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))*100
   q3  <- apply(sauc, 2, function(x) quantile(x, probs = 0.75, na.rm = TRUE))*100
   
@@ -232,10 +232,21 @@ colnames(tab1) <- c("Patients","S", "$p$", "Methods",
                     "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
 rownames(tab1) <- NULL
 
+ftn <- "
+  Patients denote the range of the number of patients.
+  $S$ denotes the number of the population studies.
+  $p$ denotes the approximate proportion of the published studies among the population.
+	Median with 25th and 75th empirical quartiles (Q1, Q3) of the SAUC at $t=2$ are reported. 
+	CR denotes the proportion of successfully convergenced estimates among 1000 repetition.
+	HZ$_P$ denotes the HZ model using the population studies; 
+	HZ$_O$ denotes the HZ model using only the corresponding numbers of published studies;
+	Prop$_{(p)}$ denotes the proposed sensitivity analysis method given $p$.
+	All the entries are multiplied by 100."
 
+if (save.tex) sink("TB-SAUC-EXP.tex")
 tab1 %>%
   kbl(
-    caption="Summary of the estimated SAUC when the true censoring is distributed as $Exp(0.2)$.",
+    caption="Summary of the estimated SAUC(2) when the true censoring is distributed as $Exp(0.2)$.",
     format = "latex",
     longtable = F, 
     booktabs = T,
@@ -245,20 +256,11 @@ tab1 %>%
     escape = FALSE,
     label = "tab2",) %>%
   add_header_above(c(rep("",4), "Biomarker1"=2, "Biomarker2"=2),escape = FALSE) %>%
-  footnote(general = "
-  Patients denote the range of the number of patients.
-  $S$ denotes the number of the population studies.
-  $p$ denotes the approximate proportion of the published studies among the population.
-	Median with 25th and 75th empirical quartiles (Q1, Q3) of the SAUC at $t=2$ are reported. 
-	CR denotes the proportion of successfully convergenced estimates among 1000 repetition.
-	HZ$_P$ denotes the HZ model using the population studies; 
-	HZ$_O$ denotes the HZ model using only the corresponding numbers of published studies;
-	Prop$_(p)$ denotes the proposed sensitivity analysis method given $p$.
-	The medians are multiplied by 100.", 
+  footnote(general = ftn, 
    escape = FALSE, 
 			threeparttable = TRUE,  
 			general_title = "")
-
+if (save.tex) sink()
 
 
 ## FUNCTION FOR CREATING SMALL TABLES
@@ -309,10 +311,10 @@ colnames(tab1) <- c("Patients","S", "$p$", "Methods",
                     "Median (Q1, Q3)", "CR", "Median (Q1, Q3)", "CR")
 rownames(tab1) <- NULL
 
-
+if (save.tex) sink("TB-SAUC-UNIF.tex")
 tab1 %>%
   kbl(
-    caption="Summary of the estimated SAUC when the true censoring is distributed as $U(1,4)$, but a misspecified exponential distribution is fitted.",
+    caption="Summary of the estimated SAUC(2) when the true censoring is distributed as $U(1,4)$, but a misspecified exponential distribution is fitted.",
     format = "latex",
     longtable = F, 
     booktabs = T,
@@ -322,21 +324,11 @@ tab1 %>%
     escape = FALSE,
     label = "tab1",) %>%
   add_header_above(c(rep("",4), "Biomarker1"=2, "Biomarker2"=2),escape = FALSE) %>%
-  footnote(general = "
-  Patients denote the range of the number of patients.
-  $S$ denotes the number of the population studies.
-  $p$ denotes the approximate proportion of the published studies among the population.
-	Median with 25th and 75th empirical quartiles (Q1, Q3) of the SAUC at $t=2$ are reported. 
-	CR denotes the proportion of successfully convergenced estimates among 1000 repetition.
-	HZ$_P$ denotes the HZ model using the population studies; 
-	HZ$_O$ denotes the HZ model using only the corresponding numbers of published studies;
-	Prop$_(p)$ denotes the proposed sensitivity analysis method given $p$.
-	The medians are multiplied by 100.", 
+  footnote(general = ftn, 
    escape = FALSE, 
 			threeparttable = TRUE,  
 			general_title = "")
-
-
+if (save.tex) sink()
 
 ```
 

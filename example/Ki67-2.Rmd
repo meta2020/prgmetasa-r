@@ -154,9 +154,8 @@ data <- na.omit(data)
 
 ## BNM Model of Hattori and Zhou
 
-bnm.int <- rep(0.1, 5)
 fn.bnm.ml  <- function(par) llk.BNM.ml(par, y1, y2, v1, v2, v12)
-opt.bnm.ml <- nlminb(bnm.int, fn.bnm.ml)
+opt.bnm.ml <- nlminb(c(rep(0.1,4), -0.1), fn.bnm.ml)
 
 par.bnm.ml <- opt.bnm.ml$par
 hes.bnm    <- numDeriv::hessian(fn.bnm.ml, opt.bnm.ml$par)
@@ -169,19 +168,19 @@ sauc.bnm   <- SAUC.ci(par.bnm.ml, var.matrix = solve(hes.bnm), sauc.type = "sroc
 
 PAR.tnm <- sapply(seq(0.9, 0.1, -0.1), function(p){
   
-  progmeta.sa(
+progmeta.sa(
   y1, y2, y3, v1, v2, v3, v12, v13, v23, 
-    p = p, 
-    sauc.type = "sroc",
-    a.interval= c(-10, 10))
+  p = p, 
+  a.interval= c(-5, 5))
   
 })
-PAR.bnm <- c(par.bnm.ml[1:2], NA, par.bnm.ml[3:4], NA, par.bnm.ml[5], rep(NA, 4), 
-													sauc.bnm, NA, NA, opt.bnm.ml$convergence)
+  
+PAR.bnm <- c(par.bnm.ml[1:2], NA, par.bnm.ml[3:4], NA, par.bnm.ml[5], rep(NA, 5), 
+             sauc.bnm, plogis(par.bnm.ml[1:2]), opt.bnm.ml$convergence)
 
 PAR.all <- cbind(PAR.bnm, PAR.tnm)
 colnames(PAR.all) <- c("HZ", paste0("p=", seq(0.9, 0.1, -0.1)))
-rownames(PAR.all) <- c(paste0("mu",1:3), paste0("tau",1:3), paste0("rho",1:3), "beta", "alpha",
+rownames(PAR.all) <- c(paste0("mu",1:3), paste0("tau",1:3), paste0("rho",1:3), "beta", "alpha","p.hat",
 																			"sauc", "sauc.lb", "sauc.ub", "sen", "spe", "converge")
 
 # round(PAR, 3) %>%
@@ -192,7 +191,7 @@ rownames(PAR.all) <- c(paste0("mu",1:3), paste0("tau",1:3), paste0("rho",1:3), "
 ## SAUC-CI
 
 ## OUTPUT1: SAUC
-par.sauc <- PAR.all[c(12:14),]
+par.sauc <- PAR.all[c(13:15),]
 
 ## OUTPUT2: PAR
 par.sroc <- PAR.all[c(1,2,4,5,7), c(1, 5,7,9)]  ##p = 0.6, 0.4, 0.2
@@ -200,8 +199,7 @@ par.sroc <- PAR.all[c(1,2,4,5,7), c(1, 5,7,9)]  ##p = 0.6, 0.4, 0.2
 ## OUTPUT3: ALPHA, BETA
 par.ab <- PAR.all[c(10,11),c(5,7,9)] 
 
-res <- list(data = data, 
-												par.all = PAR.all, par.sroc= par.sroc, par.sauc = par.sauc, par.ab=par.ab)
+res <- list(data = data, par.all = PAR.all, par.sroc= par.sroc, par.sauc = par.sauc, par.ab=par.ab)
 
 return(res)
 
@@ -229,11 +227,11 @@ TB1.c2 <- sprintf("%.3f (%.3f)", TB1[,2], plogis(TB1[,2]))
 TB1.c3 <- sprintf("%.3f (%.3f)", TB1[,3], exp(TB1[,3]))
 TB1.fn <- cbind(TB1.c1, TB1.c2, TB1.c3, TB1[,-c(1:3)])
 TB1.fn[1,3] <- NA
-header <- c("",
+header <- c("$p$",
 		"$\\mu_\\mathrm{se}$ (se)", "$\\mu_\\mathrm{sp}$ (sp)","$\\mu_\\mathrm{lnHR}$ (HR)",
 		"$\\psi_\\mathrm{se}$", "$\\psi_\\mathrm{sp}$", "$\\psi_\\mathrm{lnHR}$",
 		"$\\rho_1$", "$\\rho_2$", "$\\rho_3$", "$\\beta$", "$\\alpha$")
-col0 <- c("HZ", " $p=0.6$", "$p=0.4$", "$p=0.2$")
+col0 <- c("1*", " 0.6", "0.4", "0.2")
 TB1.fn <- cbind(col0, TB1.fn)
 rownames(TB1.fn) <- NULL
 colnames(TB1.fn) <- header
@@ -274,11 +272,11 @@ if (saveplot) sink()
 
 ```{r table2}
 
-TB3 <- t(round(res3$par.all, 3)[12:14,])
+TB3 <- t(round(res3$par.all, 3)[13:15,])
 sauc3 <- sprintf("%.3f (%.3f, %.3f)", TB3[,1], TB3[,2], TB3[,3])
 col0 <- c("SAUC (95\\% CI)")
 
-TB5 <- t(round(res5$par.all, 3)[12:14,])
+TB5 <- t(round(res5$par.all, 3)[13:15,])
 sauc5 <- sprintf("%.3f (%.3f, %.3f)", TB5[,1], TB5[,2], TB5[,3])
 col0 <- c("SAUC (95\\% CI)")
 

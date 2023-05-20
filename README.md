@@ -1,6 +1,6 @@
 # [Reproducible R Code in Rmd file] 
 
-# Sensitivity analysis for PB in meta-analysis of prognostic studiess
+# Sensitivity analysis for PB in meta-analysis of prognostic studies
 
 
 This folder contains reproducible R codes of simulation studies and re-analysis of the example data.

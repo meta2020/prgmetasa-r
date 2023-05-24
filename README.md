@@ -1,4 +1,4 @@
-# [Reproducible R Code in Rmd file] 
+# [Reproducible R Codes] 
 
 # Sensitivity analysis for PB in meta-analysis of prognostic studies
 

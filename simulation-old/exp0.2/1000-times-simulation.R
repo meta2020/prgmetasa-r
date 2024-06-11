@@ -5,7 +5,7 @@
 ##******************************************************************************
 
 {
-  
+  setwd("~/GitHub-Bios/prgmetasa-r/simulation/exp0.2")
   rm(list = ls())
   
   library(foreach)
@@ -14,12 +14,14 @@
   library(doRNG)
   library(survival)
   library(testit)
+  library(ucminf)
+  
   # library(mixmeta)
   ## LOAD FUNCTIONS
   
   files.sources <- list.files(path = "../R/")
   x <- sapply(paste0("../R/", files.sources), source)
-  rep <- 1000
+  rep <- 1
 
 }
 

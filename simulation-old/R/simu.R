@@ -194,8 +194,8 @@ simu <- function(
  
   res <- cbind(bnm.p, tnm.p, res.7, res.5, res.3)
   colnames(res) <- c("BNM.P", "TNM.P", paste0(rep(c("BNM.O", "TNM.O", "SA.o", "SA.p", "SA.n"),3),rep(c(7,5,3), each=5)))
-  return(res)
-  
+  # return(res)
+  res
   }
   
      #######

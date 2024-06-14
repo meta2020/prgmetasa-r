@@ -99,34 +99,24 @@ library(meta)
 # metabias(mt, plotit = TRUE, method.bias = "Egger")
 # funnel(mt)
 
+if (saveplot) {setEPS(width = 12, height = 6); postscript("ki67-tf.eps")}
 
-setEPS(width = 12, height = 4); postscript("ki67-tf.eps")
-
-par(mfrow = c(1,3))
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL), slab=author)
+par(mfrow = c(1,2))
+res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.1 & dataHRALL$D==1,]), slab=author)
 res.tf <- trimfill(res)
 funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
-abline(v=res$beta, lty=2)
-title("All studies")
-title("A.", adj = 0, font.main = 1, cex.main = 1)
-
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.1,]), slab=author)
-res.tf <- trimfill(res)
-funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
-abline(v=res$beta, lty=2)
 title("Cutoff = 10%")
-title("B.", adj = 0, font.main = 1, cex.main = 1)
+title("(A)", adj = 0, font.main = 1, cex.main = 1)
 
 
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.2,]), slab=author)
+res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.2 & dataHRALL$D==1,]), slab=author)
 res.tf <- trimfill(res)
 funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
-abline(v=res$beta, lty=2)
 title("Cutoff = 20%")
-title("C.", adj = 0, font.main = 1, cex.main = 1)
+title("(B)", adj = 0, font.main = 1, cex.main = 1)
 par(mfrow = c(1,1))
 
-dev.off()
+if(saveplot) dev.off()
 
 
 
@@ -136,7 +126,7 @@ dev.off()
 ```{r, include=FALSE}
 
 
-output.result <- function(TK=3){
+output.result <- function(TK=5){
 	
 data <- convert.dt(
 	data = os_hr, tK = TK, study = study, ty = ty, 
@@ -231,20 +221,20 @@ sroc.tab <- function(res = res3,
                      lab = "sroc-ki67-3"){
 	
 
-TB1 <- round(res$par.all, 3)[c(1:11),c(1,5,7,9)]
-TB1.c1 <- sprintf("%.3f (%.3f)", TB1[1,], plogis(TB1[1,]))
-TB1.c2 <- sprintf("%.3f (%.3f)", TB1[2,], plogis(TB1[2,]))
-TB1.c3 <- sprintf("%.3f (%.3f)", TB1[3,], exp(TB1[3,]))
-TB1.fn <- rbind(TB1.c1, TB1.c2, TB1.c3, TB1[-c(1:3),])
-TB1.fn[3,1] <- NA
-rnms <- c(
+TB1 <- t(round(res$par.all, 3)[c(1:11),c(1,5,7,9)])
+TB1.c1 <- sprintf("%.3f (%.3f)", TB1[,1], plogis(TB1[,1]))
+TB1.c2 <- sprintf("%.3f (%.3f)", TB1[,2], plogis(TB1[,2]))
+TB1.c3 <- sprintf("%.3f (%.3f)", TB1[,3], exp(TB1[,3]))
+TB1.fn <- cbind(TB1.c1, TB1.c2, TB1.c3, TB1[,-c(1:3)])
+TB1.fn[1,3] <- NA
+header <- c("$p$",
 		"$\\mu_\\mathrm{se}$ (se)", "$\\mu_\\mathrm{sp}$ (sp)","$\\mu_\\mathrm{lnHR}$ (HR)",
 		"$\\psi_\\mathrm{se}$", "$\\psi_\\mathrm{sp}$", "$\\psi_\\mathrm{lnHR}$",
 		"$\\rho_1$", "$\\rho_2$", "$\\rho_3$", "$\\beta$", "$\\alpha$")
-cnms <- c("", "p=1*", " p=0.6", "p=0.4", "p=0.2")
-TB1.fn <- cbind(rnms, TB1.fn)
+col0 <- c("1*", " 0.6", "0.4", "0.2")
+TB1.fn <- cbind(col0, TB1.fn)
 rownames(TB1.fn) <- NULL
-colnames(TB1.fn) <- cnms
+colnames(TB1.fn) <- header
 
 output <- TB1.fn %>%
   kbl(
@@ -261,7 +251,7 @@ output <- TB1.fn %>%
   footnote(general = "
 			$\\rho_1$ denotes the correlation coefficient between $\\mu_\\mathrm{sen}$ and $\\mu_\\mathrm{spe}$;
 			$\\rho_2$ denotes that between $\\mu_\\mathrm{sen}$ and $\\mu_\\mathrm{lnHR}$;
-			$\\rho_3$ denotes that between $\\mu_\\mathrm{spe}$ and $\\mu_\\mathrm{lnHR}$.", 
+			$\\rho_1$ denotes that between $\\mu_\\mathrm{spe}$ and $\\mu_\\mathrm{lnHR}$.", 
    escape = FALSE, 
 			threeparttable = TRUE,  
 			general_title = "") 
@@ -269,9 +259,13 @@ output <- TB1.fn %>%
 return(output)
 }
 
+if (saveplot) sink("SROC-ki67-3.tex")
 sroc.tab(res = res3, cap ="Estimates of the other parameters for the SROC$(3)$", lab = "sroc-ki67-3")
+if (saveplot) sink()
 
+if (saveplot) sink("SROC-ki67-5.tex")
 sroc.tab(res = res5, cap ="Estimates of the other parameters for the SROC$(5)$", lab = "sroc-ki67-5")
+if (saveplot) sink()
 
 ```
 
@@ -322,7 +316,7 @@ if (saveplot) sink()
 
 ```{r SAUC, fig.height=8, fig.width=12}
 
-{setEPS(width = 12, height = 8); postscript("ki67.eps")}
+if (saveplot) {setEPS(width = 12, height = 8); postscript("ki67.eps")}
 title.cex <- 1.2
 
 par(mfcol= c(2,3))
@@ -330,7 +324,6 @@ par(mfcol= c(2,3))
 ## SROC
 SROC(par = res3$par.sroc, sroc.type = "sroc", spoint.cex = 2, col = gray.colors(4, gamma = 1, start = 0, end = 0.8))
 points(plogis(-res3$data$u_spe), plogis(res3$data$u_sen))
-abline(a=0,b = 1, col="grey70", lty=2)
 legend("bottomright", 
        bty='n',
        legend = c(sprintf("HZ, SAUC = %.3f", res3$par.sauc[1,1]), 
@@ -344,7 +337,6 @@ title("(A)", adj = 0, font.main = 1, cex.main = title.cex)
 
 SROC(par = res5$par.sroc, sroc.type = "sroc", spoint.cex = 2)
 points(plogis(-res5$data$u_spe), plogis(res5$data$u_sen))
-abline(a=0,b = 1, col="grey70", lty=2)
 legend("bottomright", 
        bty='n',
        legend = c(sprintf("HZ, SAUC = %.3f", res5$par.sauc[1,1]), 
@@ -361,9 +353,8 @@ matplot(y = t(res3$par.sauc), ylim = c(0.5,0.8), type = "b",
         pch = 20, col = c("black","darkgrey","darkgrey"), 
 								lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
 axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
-abline(h=0.5, col="grey70", lty=2)
 title("t = 3")
-legend("topleft", 
+legend("bottomleft", 
        bty='n',
        legend = c("SAUC", "95% CI"), 
        col = c("black", "darkgrey"),
@@ -375,9 +366,8 @@ matplot(y = t(res3$par.sauc), ylim = c(0.5,0.8), type = "b",
         pch = 20, col = c("black","darkgrey","darkgrey"), 
 								lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
 axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
-abline(h=0.5, col="grey70", lty=2)
 title("t = 5")
-legend("topleft", 
+legend("bottomleft", 
        bty='n',
        legend = c("SAUC", "95% CI"), 
        col = c("black", "darkgrey"), 
@@ -447,7 +437,7 @@ title(xlab = "t", line=2, cex = 0.7)
 
 par(mfrow = c(1,1))
 
-dev.off()
+if(saveplot) dev.off()
 ```
 
 

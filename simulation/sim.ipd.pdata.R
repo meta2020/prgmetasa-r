@@ -48,8 +48,8 @@
     
     
     if (cens.dist == "EXP")  T.cens <- rexp(n.i, rate = 0.2)
-    if (cens.dist == "LN")   T.cens <- rlnorm(n.i, meanlog = meanlog, sdlog = sdlog)
-    if (cens.dist == "UNIF") T.cens <- runif(n.i, min = minc, max = maxc)
+    if (cens.dist == "LN")   T.cens <- rlnorm(n.i, meanlog = 1.5*log(2), sdlog = log(2))
+    if (cens.dist == "UNIF") T.cens <- runif(n.i, min = 1, max = 4)
     
     Y.time <- pmin(T.fail, T.cens)
     status <- as.numeric(T.fail==Y.time)

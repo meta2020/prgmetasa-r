@@ -65,14 +65,16 @@
     x2.u <- marker.par[2] 
     x1.s <- marker.par[3] 
     x2.s <- marker.par[4] 
-    v.sd <- marker.par[5] 
+    v.mu <- marker.par[5] 
+    v.sd <- marker.par[6] 
+
     X1 <- x1.u + x1.s*rlogis(n.i)
     X2 <- x2.u + x2.s*rlogis(n.i)
     X <- ifelse(T.fail <= tK, X1, X2)
     
     ## CUTOFF VALUES FOR i-th STUDY ----
     
-    v.i <- rnorm(1, mean = 0.5, sd = v.sd)
+    v.i <- rnorm(1, mean = v.mu, sd = v.sd)
     # v.i <- runif(1, range(X))
     ## 2.3. n0, n1 ----
     
@@ -411,6 +413,21 @@
 
 
 
+##
+## SIMULATION SCENARIOS
+##
+
+set.ls <- list(
+  S = c(35, 70, 200, 50, 100, 300),
+  tK0 = 2,
+  npt = list(c(50,150),
+             c(40,300)),
+  marker = list(c(x1.u = 0.7, x2.u = 0.3, x1.s = 0.1, x2.s = 0.4, v.mu=0.5, v.sd = 0.14), 
+                c(x1.u = 0.7, x2.u = 0.3, x1.s = 0.1, x2.s = 0.3, v.mu=0.5, v.sd = 0.2), 
+                c(x1.u = 0.7, x2.u = 0.3, x1.s = 0.7, x2.s = 0.9, v.mu=0.5, v.sd = 0.2), 
+                c(x1.u = 1, x2.u = 0.2, x1.s = 0.7, x2.s = 0.9, v.mu=0.5, v.sd = 0.2), 
+                c(x1.u = 1, x2.u = 0.2, x1.s = 0.7, x2.s = 0.9, v.mu=0.5, v.sd = 0.3)) 
+)
 
 
 

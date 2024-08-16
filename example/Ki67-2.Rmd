@@ -10,21 +10,21 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE)
-rm(list = ls())
+# rm(list = ls())
 ```
 
 
 ```{r, include=FALSE}
-files.sources <- list.files(path = "R/")
-x <- sapply(paste0("R/", files.sources), source)
+files.sources = list.files(path = "R/")
+x = sapply(paste0("R/", files.sources), source)
 options(knitr.kable.NA = '')
 library(readxl)
 library(knitr)
 library(kableExtra)
 library(latex2exp)
 library(numDeriv)
-
-saveplot <- F
+library(metafor)
+library(mnormt)
 
 ```
 
@@ -35,51 +35,51 @@ saveplot <- F
 ##
 
 ## MEDIAN FU 
-med.data <- read_excel("Ki67.xlsx", sheet = "MCT")
-med.data$mty <- med.data$mct_mo/12
+med.data = read_excel("Ki67.xlsx", sheet = "MCT")
+med.data$mty = med.data$mct_mo/12
 
 ## OBTAIN ETA
-eta <- cens.eta(data = med.data, med.year = mty,  n1 = n1, n0 = n0, s1_med = s1_mct, s0_med = s0_mct)$par
+eta = cens.eta(data = med.data, med.year = mty,  n1 = n1, n0 = n0, s1_med = s1_mct, s0_med = s0_mct)$par
 
 
 ## OS DATA
 
-os.data  <- read_excel("Ki67.xlsx", sheet = "OS")
-os.data$ty <- os.data$t/12
+os.data  = read_excel("Ki67.xlsx", sheet = "OS")
+os.data$ty = os.data$t/12
 
 ## HR DATA
 
-dataHR <-read_excel("Ki67.xlsx", sheet = "HR")
-dataHR$u_lnHR <- log(dataHR$HR)
-ln_ci.low   <- log(dataHR$ci.low)
-ln_ci.up    <- log(dataHR$ci.up)
-se          <- (ln_ci.up - ln_ci.low)/(2 * qnorm(0.975))
-dataHR$v_lnHR <- se^2
+dataHR =read_excel("Ki67.xlsx", sheet = "HR")
+dataHR$u_lnHR = log(dataHR$HR)
+ln_ci.low   = log(dataHR$ci.low)
+ln_ci.up    = log(dataHR$ci.up)
+se          = (ln_ci.up - ln_ci.low)/(2 * qnorm(0.975))
+dataHR$v_lnHR = se^2
 
 ## MERGED DATA (OS+HR)
-os_hr <- merge(os.data, dataHR, all.x = TRUE)
+os_hr = merge(os.data, dataHR, all.x = TRUE)
 
 
 ## LOG-HR DATA
-dataHRALL <-read_excel("Ki67.xlsx", sheet = "HR_all")
-dataHRALL$u_lnHR <- log(dataHRALL$HR)
-ln_ci.low   <- log(dataHRALL$ci.low)
-ln_ci.up    <- log(dataHRALL$ci.up)
-se          <- (ln_ci.up - ln_ci.low)/(2 * qnorm(0.975))
-dataHRALL$v_lnHR <- se^2
-dataHRALL$t_lnHR <- dataHRALL$u_lnHR/se
+dataHRALL =read_excel("Ki67.xlsx", sheet = "HR_all")
+dataHRALL$u_lnHR = log(dataHRALL$HR)
+ln_ci.low   = log(dataHRALL$ci.low)
+ln_ci.up    = log(dataHRALL$ci.up)
+se          = (ln_ci.up - ln_ci.low)/(2 * qnorm(0.975))
+dataHRALL$v_lnHR = se^2
+dataHRALL$t_lnHR = dataHRALL$u_lnHR/se
 
-studylab.hr <- dataHRALL$author
-studylab.d1 <- unname(unlist(dataHRALL[dataHRALL$D==1, "author"]))
-studylab.t3 <- studylab.hr %in% unname(unlist(os.data[os.data$ty==3, "author"])) 
-studylab.t5 <- studylab.hr %in% unname(unlist(os.data[os.data$ty==5, "author"]))
+studylab.hr = dataHRALL$author
+studylab.d1 = unname(unlist(dataHRALL[dataHRALL$D==1, "author"]))
+studylab.t3 = studylab.hr %in% unname(unlist(os.data[os.data$ty==3, "author"])) 
+studylab.t5 = studylab.hr %in% unname(unlist(os.data[os.data$ty==5, "author"]))
 
-t1 <- dataHRALL[dataHRALL$D==1,]$t_lnHR
-t0 <- dataHRALL[dataHRALL$D==0,]$t_lnHR
-t1.t3 <- dataHRALL[studylab.t3,]$t_lnHR
-t0.t3 <- dataHRALL[!studylab.t3,]$t_lnHR
-t1.t5 <- dataHRALL[studylab.t5,]$t_lnHR
-t0.t5 <- dataHRALL[!studylab.t5,]$t_lnHR
+t1 = dataHRALL[dataHRALL$D==1,]$t_lnHR
+t0 = dataHRALL[dataHRALL$D==0,]$t_lnHR
+t1.t3 = dataHRALL[studylab.t3,]$t_lnHR
+t0.t3 = dataHRALL[!studylab.t3,]$t_lnHR
+t1.t5 = dataHRALL[studylab.t5,]$t_lnHR
+t0.t5 = dataHRALL[!studylab.t5,]$t_lnHR
 
 ## THE NUMBER OF UNIQUE DATA
 # length(unique(os_hr$study))
@@ -91,44 +91,83 @@ t0.t5 <- dataHRALL[!studylab.t5,]$t_lnHR
 ```{r, fig.width=12, fig.height=4}
 library(metafor)
 library(meta)
+data = na.omit(dataHRALL)
+data$grp = with(
+  data, 
+  ifelse(cutoff<0.1,"<0.1", ifelse(cutoff==0.1,"0.1",
+  ifelse(cutoff<0.2,"(0.1,0.2)", ifelse(cutoff==0.2,"0.2", ">0.2"))))) %>% 
+  factor(, levels = c("<0.1","0.1","(0.1,0.2)","0.2",">0.2"))
+data$grp2 = with(
+  data, 
+  ifelse(cutoff<0.1,1, ifelse(cutoff==0.1,2,
+  ifelse(cutoff<0.2,3, ifelse(cutoff==0.2,4, 5))))) %>% 
+  factor(, levels = c(1:5))
+data$p = round(pnorm(abs(data$u_lnHR/sqrt(data$v_lnHR)), lower.tail = F)*2,3)
+data$p.grp = ifelse(data$p<=0.05, 1,2)
+
+m2 = metagen(TE=u_lnHR,seTE=sqrt(v_lnHR),data = data,
+             studlab = author2,subgroup = grp,
+             common=F,random = T, subgroup.name = "Cutoff",
+             layout = "RevMan5")
+setEPS(width = 8, height = 13); postscript("ki67-fp.eps")
+forest(m2)
+dev.off()
+
 
 # sort((dataHRALL$cutoff))
 
-# dt <- na.omit(dataHRALL[dataHRALL$cutoff==0.1,])
-# mt <- metagen(dt$u_lnHR, sqrt(dt$v_lnHR), sm = "MD", method.tau = "PM")
+# dt = na.omit(dataHRALL[dataHRALL$cutoff==0.1,])
+# mt = metagen(dt$u_lnHR, sqrt(dt$v_lnHR), sm = "MD", method.tau = "PM")
 # metabias(mt, plotit = TRUE, method.bias = "Egger")
 # funnel(mt)
 
 
-setEPS(width = 12, height = 4); postscript("ki67-tf.eps")
 
-par(mfrow = c(1,3))
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL), slab=author)
-res.tf <- trimfill(res)
+setEPS(width = 12, height = 12); postscript("ki67-tf.eps")
+
+par(mfrow = c(2,2))
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data, slab=author, method="ML")
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
+points(res.tf$yi[!res.tf$fill], sqrt(res.tf$vi)[!res.tf$fill], col=data$p.grp, pch=19)
+abline(v=res$beta, lty=2)
+p.val = pmin(1, pnorm(abs(res.tf$yi[res.tf$fill]/sqrt(res.tf$vi[res.tf$fill])),lower.tail = F)*2)
+text(res.tf$yi[res.tf$fill]+0.1, sqrt(res.tf$vi)[res.tf$fill], 1:8)
+legend("topleft", bg="white",
+       legend = c("P<0.05", "P>=0.05", sprintf("%1.0f: P=%.3f",1:8,p.val)),
+       pch=c(19, 19, rep(21, 8)),
+       col=c(1,2,rep(1, 8)))
+title("A. 38 Studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
+
+data2 = data[data$D==1,]
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data2, slab=author, method="ML")
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
+points(res.tf$yi[!res.tf$fill], sqrt(res.tf$vi)[!res.tf$fill], col=data2$p.grp, pch=19)
+abline(v=res$beta, lty=2)
+p.val = pmin(1, pnorm(abs(res.tf$yi[res.tf$fill]/sqrt(res.tf$vi[res.tf$fill])),lower.tail = F)*2)
+text(res.tf$yi[res.tf$fill]+0.1, sqrt(res.tf$vi)[res.tf$fill], 1:6)
+legend("topleft", bg="white",
+       legend = c("P<0.05", "P>=0.05", sprintf("%1.0f: P=%.3f",1:6,p.val)),
+       pch=c(19, 19, rep(21, 8)),
+       col=c(1,2,rep(1, 8)))
+title("B. 23 Studies reporting the KM curves", adj = 0, font.main = 1, cex.main = 1)
+
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data[data$cutoff==0.1,], slab=author)
+res.tf = trimfill(res)
 funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
 abline(v=res$beta, lty=2)
-title("All studies")
-title("A.", adj = 0, font.main = 1, cex.main = 1)
+title("C. Studies with cutoff = 0.1 among 38 studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
 
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.1,]), slab=author)
-res.tf <- trimfill(res)
+
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data[data$cutoff==0.2,], slab=author)
+res.tf = trimfill(res)
 funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
 abline(v=res$beta, lty=2)
-title("Cutoff = 10%")
-title("B.", adj = 0, font.main = 1, cex.main = 1)
+title("D. Studies with cutoff = 0.2 among 38 studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
 
-
-res <- rma(yi=u_lnHR, vi=v_lnHR, data=na.omit(dataHRALL[dataHRALL$cutoff==0.2,]), slab=author)
-res.tf <- trimfill(res)
-funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
-abline(v=res$beta, lty=2)
-title("Cutoff = 20%")
-title("C.", adj = 0, font.main = 1, cex.main = 1)
 par(mfrow = c(1,1))
-
 dev.off()
-
-
 
 ```
 
@@ -136,61 +175,51 @@ dev.off()
 ```{r, include=FALSE}
 
 
-output.result <- function(TK=3){
+output.result = function(TK=3){
 	
-data <- convert.dt(
+data = convert.dt(
 	data = os_hr, tK = TK, study = study, ty = ty, 
 	n1 = n1, n0 = n0, s1 = s1, s0 = s0, u_lnHR = u_lnHR, v_lnHR = v_lnHR, 
 	eta = eta)
 
 ## REMOVE OBSERVATIONS WITH MISSING VALUES
-data <- na.omit(data)
+data = na.omit(data)
 
 ## OBS DATA
 
 {
-  y1  <- data$u_sen
-  y2  <- data$u_spe 
-  y3  <- data$u_lnHR
+  y1  = data$u_sen
+  y2  = data$u_spe 
+  y3  = data$u_lnHR
   
-  v1  <- data$v_sen
-  v2  <- data$v_spe 
-  v3  <- data$v_lnHR
+  v1  = data$v_sen
+  v2  = data$v_spe 
+  v3  = data$v_lnHR
   
-  v12 <- data$v_senspe 
-  v13 <- data$v_senlnHR 
-  v23 <- data$v_spelnHR
+  v12 = data$v_senspe 
+  v13 = data$v_senlnHR 
+  v23 = data$v_spelnHR
 }
 
 ## BNM Model of Hattori and Zhou
-
-fn.bnm.ml  <- function(par) llk.BNM.ml(par, y1, y2, v1, v2, v12)
-opt.bnm.ml <- nlminb(c(rep(0.1,4), -0.1), fn.bnm.ml)
-
-par.bnm.ml <- opt.bnm.ml$par
-hes.bnm    <- numDeriv::hessian(fn.bnm.ml, opt.bnm.ml$par)
-rownames(hes.bnm) <- colnames(hes.bnm) <- c("mu.se", "mu.sp", "tau.sp", "tau.sp", "rho")
-sauc.bnm   <- SAUC.ci(par.bnm.ml, var.matrix = solve(hes.bnm), sauc.type = "sroc" )
+PAR.bnm = HZ.model(y1, y2, v1, v2, v12)
 
 
 ## Sensitivity analysis
-
-
-PAR.tnm <- sapply(seq(0.9, 0.1, -0.1), function(p){
+PAR.tnm = sapply(seq(1, 0.1, -0.1), function(p){
   
-progmeta.sa(
-  y1, y2, y3, v1, v2, v3, v12, v13, v23, 
-  p = p, 
-  a.interval= c(-5, 5))
-  
+  progmeta.sa(
+    y1, y2, y3, v1, v2, v3, v12, v13, v23, 
+    p, 
+    a.interval= c(-5, 5))
 })
   
-PAR.bnm <- c(par.bnm.ml[1:2], NA, par.bnm.ml[3:4], NA, par.bnm.ml[5], rep(NA, 5), 
-             sauc.bnm, plogis(par.bnm.ml[1:2]), opt.bnm.ml$convergence)
+PAR.bnm = c(PAR.bnm[1:2], NA, PAR.bnm[3:4], NA, PAR.bnm[5], rep(NA, 5), 
+             PAR.bnm[6:11])
 
-PAR.all <- cbind(PAR.bnm, PAR.tnm)
-colnames(PAR.all) <- c("HZ", paste0("p=", seq(0.9, 0.1, -0.1)))
-rownames(PAR.all) <- c(paste0("mu",1:3), paste0("tau",1:3), paste0("rho",1:3), "beta", "alpha","p.hat",
+PAR.all = cbind(PAR.bnm, PAR.tnm)
+colnames(PAR.all) = c("HZ", paste0("p=", seq(1, 0.1, -0.1)))
+rownames(PAR.all) = c(paste0("mu",1:3), paste0("tau",1:3), paste0("rho",1:3), "beta", "alpha","p.hat",
 																			"sauc", "sauc.lb", "sauc.ub", "sen", "spe", "converge")
 
 # round(PAR, 3) %>%
@@ -201,23 +230,22 @@ rownames(PAR.all) <- c(paste0("mu",1:3), paste0("tau",1:3), paste0("rho",1:3), "
 ## SAUC-CI
 
 ## OUTPUT1: SAUC
-par.sauc <- PAR.all[c(13:15),]
+par.sauc = PAR.all[c(13:15),]
 
 ## OUTPUT2: PAR
-par.sroc <- PAR.all[c(1,2,4,5,7), c(1, 5,7,9)]  ##p = 0.6, 0.4, 0.2
+par.sroc = PAR.all[c(1,2,4,5,7), c(1, 5,7,9)]  ##p = 0.6, 0.4, 0.2
 
 ## OUTPUT3: ALPHA, BETA
-par.ab <- PAR.all[c(10,11),c(5,7,9)] 
+par.ab = PAR.all[c(10,11),c(5,7,9)] 
 
-res <- list(data = data, par.all = PAR.all, par.sroc= par.sroc, par.sauc = par.sauc, par.ab=par.ab)
+res = list(data = data, par.all = PAR.all, par.sroc= par.sroc, par.sauc = par.sauc, par.ab=par.ab)
 
 return(res)
 
 }
 
-
-res3 <- output.result(TK=3)
-res5 <- output.result(TK=5)
+res3 = output.result(TK=3)
+res5 = output.result(TK=5)
 
 
 ```
@@ -226,27 +254,27 @@ res5 <- output.result(TK=5)
 
 
 ```{r table1}
-sroc.tab <- function(res = res3, 
+sroc.tab = function(res = res3, 
                      cap ="Estimates of the parameters for the SROC curve at $t=3$",
                      lab = "sroc-ki67-3"){
 	
 
-TB1 <- round(res$par.all, 3)[c(1:11),c(1,5,7,9)]
-TB1.c1 <- sprintf("%.3f (%.3f)", TB1[1,], plogis(TB1[1,]))
-TB1.c2 <- sprintf("%.3f (%.3f)", TB1[2,], plogis(TB1[2,]))
-TB1.c3 <- sprintf("%.3f (%.3f)", TB1[3,], exp(TB1[3,]))
-TB1.fn <- rbind(TB1.c1, TB1.c2, TB1.c3, TB1[-c(1:3),])
-TB1.fn[3,1] <- NA
-rnms <- c(
+TB1 = round(res$par.all, 3)[c(1:11),c(1,5,7,9)]
+TB1.c1 = sprintf("%.3f (%.3f)", TB1[1,], plogis(TB1[1,]))
+TB1.c2 = sprintf("%.3f (%.3f)", TB1[2,], plogis(TB1[2,]))
+TB1.c3 = sprintf("%.3f (%.3f)", TB1[3,], exp(TB1[3,]))
+TB1.fn = rbind(TB1.c1, TB1.c2, TB1.c3, TB1[-c(1:3),])
+TB1.fn[3,1] = NA
+rnms = c(
 		"$\\mu_\\mathrm{se}$ (se)", "$\\mu_\\mathrm{sp}$ (sp)","$\\mu_\\mathrm{lnHR}$ (HR)",
 		"$\\psi_\\mathrm{se}$", "$\\psi_\\mathrm{sp}$", "$\\psi_\\mathrm{lnHR}$",
 		"$\\rho_1$", "$\\rho_2$", "$\\rho_3$", "$\\beta$", "$\\alpha$")
-cnms <- c("", "p=1*", " p=0.6", "p=0.4", "p=0.2")
-TB1.fn <- cbind(rnms, TB1.fn)
-rownames(TB1.fn) <- NULL
-colnames(TB1.fn) <- cnms
+cnms = c("", "p=1*", " p=0.6", "p=0.4", "p=0.2")
+TB1.fn = cbind(rnms, TB1.fn)
+rownames(TB1.fn) = NULL
+colnames(TB1.fn) = cnms
 
-output <- TB1.fn %>%
+output = TB1.fn %>%
   kbl(
     caption = cap,
     # format = ifelse(save.tex, "latex", "html"),
@@ -278,22 +306,21 @@ sroc.tab(res = res5, cap ="Estimates of the other parameters for the SROC$(5)$",
 
 ```{r table2}
 
-TB3 <- t(round(res3$par.all, 3)[13:15,])
-sauc3 <- sprintf("%.3f (%.3f, %.3f)", TB3[,1], TB3[,2], TB3[,3])
-col0 <- c("SAUC (95\\% CI)")
+TB3 = t(round(res3$par.all, 3)[13:15,-2])
+sauc3 = sprintf("%.3f (%.3f, %.3f)", TB3[,1], TB3[,2], TB3[,3])
+col0 = c("SAUC (95\\% CI)")
 
-TB5 <- t(round(res5$par.all, 3)[13:15,])
-sauc5 <- sprintf("%.3f (%.3f, %.3f)", TB5[,1], TB5[,2], TB5[,3])
-col0 <- c("SAUC (95\\% CI)")
+TB5 = t(round(res5$par.all, 3)[13:15,-2])
+sauc5 = sprintf("%.3f (%.3f, %.3f)", TB5[,1], TB5[,2], TB5[,3])
+col0 = c("SAUC (95\\% CI)")
 
-col <- c("HZ", "$p=0.9$", "$p=0.8$", "$p=0.7$", "$p=0.6$", "$p=0.5$",
+col = c("HZ", "$p=0.9$", "$p=0.8$", "$p=0.7$", "$p=0.6$", "$p=0.5$",
 									"$p=0.4$", "$p=0.3$", "$p=0.2$", "$p=0.1$")
-TB <- cbind(col, sauc3, sauc5)
+TB = cbind(col, sauc3, sauc5)
 
-rownames(TB) <- NULL
-colnames(TB) <- c("","SAUC(3) (95\\% CI)", "SAUC(5) (95\\% CI)")
+rownames(TB) = NULL
+colnames(TB) = c("","SAUC(3) (95\\% CI)", "SAUC(5) (95\\% CI)")
 
-if (saveplot) sink("SAUC-ki67.tex")
 
 TB %>%
   kbl(
@@ -311,7 +338,7 @@ TB %>%
     label = "sauc-ki67") 
 # %>%  add_header_above(c("","HZ", paste0("p =", seq(0.9, 0.1, -0.1))),escape = FALSE) 
 
-if (saveplot) sink()
+
 
 
 ```
@@ -323,77 +350,74 @@ if (saveplot) sink()
 ```{r SAUC, fig.height=8, fig.width=12}
 
 {setEPS(width = 12, height = 8); postscript("ki67.eps")}
-title.cex <- 1.2
+title.cex = 1.2
 
 par(mfcol= c(2,3))
 
 ## SROC
-SROC(par = res3$par.sroc, sroc.type = "sroc", spoint.cex = 2, col = gray.colors(4, gamma = 1, start = 0, end = 0.8))
-points(plogis(-res3$data$u_spe), plogis(res3$data$u_sen))
+SROC(par = res3$par.sroc, sroc.type = "sroc", spoint.cex = 2, ncols = 1:4)
+points(plogis(-res3$data$u_spe), plogis(res3$data$u_sen), pch=4, col="grey40")
 abline(a=0,b = 1, col="grey70", lty=2)
 legend("bottomright", 
        bty='n',
        legend = c(sprintf("HZ, SAUC = %.3f", res3$par.sauc[1,1]), 
                   sprintf("p = %.2f, SAUC = %.3f", c(0.6, 0.4, 0.2), c(res3$par.sauc[1,c(5,7,9)]))), 
-       col = gray.colors(4, gamma = 1, start = 0, end = 0.8), 
+       col = 1:4, 
        pch = 18, pt.cex = 1.5, cex = 1.5, 
        lty = rep(1,2))
-title("t = 3")
-title("(A)", adj = 0, font.main = 1, cex.main = title.cex)
+title("A. The third year (t = 3)", adj = 0, font.main = 1, cex.main = title.cex)
 
 
-SROC(par = res5$par.sroc, sroc.type = "sroc", spoint.cex = 2)
-points(plogis(-res5$data$u_spe), plogis(res5$data$u_sen))
+SROC(par = res5$par.sroc, sroc.type = "sroc", spoint.cex = 2, ncols = 1:4)
+points(plogis(-res5$data$u_spe), plogis(res5$data$u_sen), pch=4, col="grey40")
 abline(a=0,b = 1, col="grey70", lty=2)
 legend("bottomright", 
        bty='n',
        legend = c(sprintf("HZ, SAUC = %.3f", res5$par.sauc[1,1]), 
                   sprintf("p = %.2f, SAUC = %.3f", c(0.6, 0.4, 0.2), c(res5$par.sauc[1,c(5,7,9)]))), 
-       col = gray.colors(4, gamma = 1, start = 0, end = 0.8), 
+       col = 1:4, 
        pch = 18, pt.cex = 1.5, cex = 1.5, 
        lty = rep(1,2))
-title("t = 5")
-title("(D)", adj = 0, font.main = 1, cex.main = title.cex)
+title("D. The third year (t = 5)", adj = 0, font.main = 1, cex.main = title.cex)
 
 
 ## SAUC
-matplot(y = t(res3$par.sauc), ylim = c(0.5,0.8), type = "b", 
+matplot(y = t(res3$par.sauc[,-2]), ylim = c(0.5,0.8), type = "b", 
         pch = 20, col = c("black","darkgrey","darkgrey"), 
 								lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
 axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
 abline(h=0.5, col="grey70", lty=2)
-title("t = 3")
 legend("topleft", 
        bty='n',
        legend = c("SAUC", "95% CI"), 
        col = c("black", "darkgrey"),
        lty = c(1,2),
 							cex = 1.5)
-title("(B)", adj = 0, font.main = 1, cex.main = title.cex)
+title("B. The third year (t = 3)", adj = 0, font.main = 1, cex.main = title.cex)
 
-matplot(y = t(res3$par.sauc), ylim = c(0.5,0.8), type = "b", 
+
+matplot(y = t(res5$par.sauc[,-2]), ylim = c(0.5,0.8), type = "b", 
         pch = 20, col = c("black","darkgrey","darkgrey"), 
 								lty = c(1, 2,2), xlab = "p", ylab = "SAUC",  xaxt = "n")
 axis(1, at = 1:10, labels = seq(1,0.1,-0.1))
 abline(h=0.5, col="grey70", lty=2)
-title("t = 5")
 legend("topleft", 
        bty='n',
        legend = c("SAUC", "95% CI"), 
        col = c("black", "darkgrey"), 
        lty = c(1,2),
 							cex = 1.5)
-title("(E)", adj = 0, font.main = 1, cex.main = title.cex)
+title("E. The third year (t = 5)", adj = 0, font.main = 1, cex.main = title.cex)
 
 
 
 ## A
-beta1  <- res3$par.ab[1,1]
-alpha1 <- res3$par.ab[2,1]
-beta2  <- res3$par.ab[1,2]
-alpha2 <- res3$par.ab[2,2]
-beta3  <- res3$par.ab[1,3]
-alpha3 <- res3$par.ab[2,3]
+beta1  = res3$par.ab[1,1]
+alpha1 = res3$par.ab[2,1]
+beta2  = res3$par.ab[1,2]
+alpha2 = res3$par.ab[2,2]
+beta3  = res3$par.ab[1,3]
+alpha3 = res3$par.ab[2,3]
 
 curve(pnorm(beta1*x + alpha1), -10, 15, ylim = c(0,1), xlim = c(-3,7),
       xlab = "", ylab = "",
@@ -404,24 +428,23 @@ curve(pnorm(beta3*x + alpha3), -5, 10, add = TRUE, col=3)
 axis(2, at=c(0,0.5,1), labels = c(0,0.5,1))
 # points(t1.t3, rep(1,   length(t1.t3)), pch="|", col=1, cex = 1)
 points(t0.t3, rep(1,   length(t0.t3)), pch="|", col="black", cex = 1)
-title("t = 3")
 legend("bottomright", 
        bty='n',
        legend = TeX(sprintf("$p = %.1f$", c(0.6, 0.4, 0.2))), 
        col = 1:3, cex = 1.5, 
        lty = rep(1,3))
-title("(C)", adj = 0, font.main = 1, cex.main = title.cex)
+title("C. The third year (t = 3)", adj = 0, font.main = 1, cex.main = title.cex)
 mtext(TeX("$p = \\Phi(\\beta \\, t + \\alpha)$"), side=2, line=2, at=c(0.5), cex = 1)
 title(xlab = "t", line=2, cex = 0.7)
 
 
 ## B
-beta1  <- res5$par.ab[1,1]
-alpha1 <- res5$par.ab[2,1]
-beta2  <- res5$par.ab[1,2]
-alpha2 <- res5$par.ab[2,2]
-beta3  <- res5$par.ab[1,3]
-alpha3 <- res5$par.ab[2,3]
+beta1  = res5$par.ab[1,1]
+alpha1 = res5$par.ab[2,1]
+beta2  = res5$par.ab[1,2]
+alpha2 = res5$par.ab[2,2]
+beta3  = res5$par.ab[1,3]
+alpha3 = res5$par.ab[2,3]
 
 curve(pnorm(beta1*x + alpha1), -5, 10, ylim = c(0,1), xlim = c(-3,7),
       xlab = "", ylab="",
@@ -432,14 +455,12 @@ curve(pnorm(beta3*x + alpha3), -5, 10, add = TRUE, col=3)
 axis(2, at=c(0,0.5,1), labels = c(0,0.5,1))
 # points(t1.t5, rep(1, length(t1.t5)), pch="|", col=1, cex = 1)
 points(t0.t5, rep(1, length(t0.t5)), pch="|", col="black", cex = 1)
-# abline(h=0.5, col = "grey", lty=2)
-title("t = 5")
 legend("bottomright", 
        bty='n',
        legend = TeX(sprintf("$p = %.1f$",c(0.6, 0.4, 0.2))), 
        col = 1:3, cex = 1.5, 
        lty = rep(1,3))
-title("(F)", adj = 0, font.main = 1, cex.main = title.cex)
+title("F. The third year (t = 5)", adj = 0, font.main = 1, cex.main = title.cex)
 mtext(TeX("$p = \\Phi(\\beta \\, t + \\alpha)$"), side=2, line=2, at=c(0.5), cex = 1)
 title(xlab = "t", line=2, cex = 0.7)
 # abline(h=0.5, col = "grey", lty=2)
@@ -451,4 +472,53 @@ dev.off()
 ```
 
 
+```{r}
+
+setEPS(width = 12, height = 8); postscript("ki67-tf-t.eps")
+par(mfrow= c(2,3))
+data35 = res3$data
+data35$p = round(pnorm(abs(data35$u_lnHR/sqrt(data35$v_lnHR)), lower.tail = F)*2,3)
+data35$p.grp = ifelse(data35$p<=0.05, 1,2)
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data35, slab=study, method="ML")
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
+abline(v=res$beta, lty=2)
+title("A. The third year (t = 3)", adj = 0, font.main = 1, cex.main = 1)
+
+res = rma(yi=u_sen, vi=v_sen, data=data35, slab=study, method="ML")
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2,legend = FALSE, xlab = "logit(sensitivity)")
+abline(v=res$beta, lty=2)
+title("B. The third year (t = 3)", adj = 0, font.main = 1, cex.main = 1)
+
+res = rma(yi=u_spe, vi=v_spe, data=data35, slab=study, method="ML")
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2, legend = FALSE, xlab = "logit(specificity)")
+abline(v=res$beta, lty=2)
+title("C. The third year (t = 3)", adj = 0, font.main = 1, cex.main = 1)
+
+data35 = res5$data
+data35$p = round(pnorm(abs(data35$u_lnHR/sqrt(data35$v_lnHR)), lower.tail = F)*2,3)
+data35$p.grp = ifelse(data35$p<=0.05, 1,2)
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data35, slab=study, method="ML")
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
+abline(v=res$beta, lty=2)
+title("D. The fifth year (t = 5)", adj = 0, font.main = 1, cex.main = 1)
+
+res = rma(yi=u_sen, vi=v_sen, data=data35, slab=study, method="ML")
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2,legend = FALSE, xlab = "logit(sensitivity)")
+abline(v=res$beta, lty=2)
+title("E. The fifth year (t = 5)", adj = 0, font.main = 1, cex.main = 1)
+
+res = rma(yi=u_spe, vi=v_spe, data=data35, slab=study, method="ML")
+res.tf = trimfill(res, estimator = "Q0")
+funnel(res.tf, cex=1.2, legend = FALSE, xlab = "logit(specificity)")
+abline(v=res$beta, lty=2)
+title("F. The fifth year (t = 5)", adj = 0, font.main = 1, cex.main = 1)
+par(mfrow = c(1,1))
+
+dev.off()
+```
 

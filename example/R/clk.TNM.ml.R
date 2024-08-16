@@ -42,7 +42,7 @@ clk.TNM.ml <- function(
   v13 <- v13 + t13
   v23 <- v23 + t23
 
-  t_lnHR   <- abs(y3/sqrt(v3))
+  t_lnHR   <- (y3-mean(y3)/sqrt(v3))
 
   ##
   ## FUNCTOIN b(Sigma) ----

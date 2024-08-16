@@ -30,13 +30,15 @@
   conv<- 1-apply(DATA, 1:2, function(x) mean(x, na.rm = TRUE))[11,3]
   sn = apply(DATA, 1:2, function(x) mean(x, na.rm = TRUE))[13,]
   
-  s=c(sprintf("%1.f (%1.f)",sn[1], sn[2]))
-  sauc = c(sprintf("%.2f (%.2f, %.2f)",med, q1, q3))
-  res = rbind(res, c(s, mark.n, sauc, round(conv*100,2), sprintf("%.2f", med[2]-med[1]), sprintf("%.2f", med[3]-med[1])))
+  s=sprintf("%1.f (%1.f)",sn[1], sn[2])
+  sauc=sprintf("%.2f (%.2f, %.2f)",med, q1, q3)
+  res = rbind(res, c(s, mark.n, sauc, round(conv*100,2), 
+                     sprintf("%.2f", (med[2]-med[1])), sprintf("%.2f", (med[3]-med[1])),
+                     sprintf("%.2f", 100*(med[3]-med[2])/(med[2]-med[1]))))
   }
   
   
-  colnames(res) <- c("$S (N)$","B","BNM$_P$", "BNM$_O$", "Proposal", "CR", "PB", "Bias")
+  colnames(res) <- c("$S (N)$","B","BNM$_P$", "BNM$_O$", "Proposal", "CR", "PB", "Bias", "RB")
   
   # gsub("NaN \\(NA\\)", "", res)
   

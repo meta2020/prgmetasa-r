@@ -1,4 +1,4 @@
-# [Reproducible R Codes] 
+# [Reproducible results with R codes] 
 
 # Sensitivity analysis for PB in meta-analysis of prognostic studies
 

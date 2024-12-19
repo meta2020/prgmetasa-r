@@ -123,9 +123,9 @@ dev.off()
 
 
 
-setEPS(width = 12, height = 12); postscript("ki67-tf.eps")
+setEPS(width = 12, height = 4); postscript("ki67-tf.eps")
 
-par(mfrow = c(2,2))
+par(mfrow = c(1,3))
 res = rma(yi=u_lnHR, vi=v_lnHR, data=data, slab=author, method="ML")
 res.tf = trimfill(res)
 funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
@@ -133,12 +133,30 @@ points(res.tf$yi[!res.tf$fill], sqrt(res.tf$vi)[!res.tf$fill], col=data$p.grp, p
 abline(v=res$beta, lty=2)
 p.val = pmin(1, pnorm(abs(res.tf$yi[res.tf$fill]/sqrt(res.tf$vi[res.tf$fill])),lower.tail = F)*2)
 text(res.tf$yi[res.tf$fill]+0.1, sqrt(res.tf$vi)[res.tf$fill], 1:8)
-legend("topleft", bg="white",
+legend("topright", bg="white",
        legend = c("P<0.05", "P>=0.05", sprintf("%1.0f: P=%.3f",1:8,p.val)),
        pch=c(19, 19, rep(21, 8)),
        col=c(1,2,rep(1, 8)))
 title("A. 38 Studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
 
+
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data[data$cutoff==0.1,], slab=author)
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
+abline(v=res$beta, lty=2)
+title("B. Studies with cutoff = 0.1 among 38 studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
+
+
+res = rma(yi=u_lnHR, vi=v_lnHR, data=data[data$cutoff==0.2,], slab=author)
+res.tf = trimfill(res)
+funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
+abline(v=res$beta, lty=2)
+title("C. Studies with cutoff = 0.2 among 38 studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
+
+par(mfrow = c(1,1))
+dev.off()
+
+setEPS(width = 6, height = 6); postscript("ki67-tf2.eps")
 data2 = data[data$D==1,]
 res = rma(yi=u_lnHR, vi=v_lnHR, data=data2, slab=author, method="ML")
 res.tf = trimfill(res)
@@ -147,28 +165,12 @@ points(res.tf$yi[!res.tf$fill], sqrt(res.tf$vi)[!res.tf$fill], col=data2$p.grp, 
 abline(v=res$beta, lty=2)
 p.val = pmin(1, pnorm(abs(res.tf$yi[res.tf$fill]/sqrt(res.tf$vi[res.tf$fill])),lower.tail = F)*2)
 text(res.tf$yi[res.tf$fill]+0.1, sqrt(res.tf$vi)[res.tf$fill], 1:6)
-legend("topleft", bg="white",
+legend("topright", bg="white",
        legend = c("P<0.05", "P>=0.05", sprintf("%1.0f: P=%.3f",1:6,p.val)),
        pch=c(19, 19, rep(21, 8)),
        col=c(1,2,rep(1, 8)))
-title("B. 23 Studies reporting the KM curves", adj = 0, font.main = 1, cex.main = 1)
-
-res = rma(yi=u_lnHR, vi=v_lnHR, data=data[data$cutoff==0.1,], slab=author)
-res.tf = trimfill(res)
-funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
-abline(v=res$beta, lty=2)
-title("C. Studies with cutoff = 0.1 among 38 studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
-
-
-res = rma(yi=u_lnHR, vi=v_lnHR, data=data[data$cutoff==0.2,], slab=author)
-res.tf = trimfill(res)
-funnel(res.tf, cex=1.2, xlim=c(-2,3), legend = FALSE, xlab = "lnHR")
-abline(v=res$beta, lty=2)
-title("D. Studies with cutoff = 0.2 among 38 studies reporting the lnHR", adj = 0, font.main = 1, cex.main = 1)
-
-par(mfrow = c(1,1))
+title("23 Studies reporting the KM curves", adj = 0, font.main = 1, cex.main = 1)
 dev.off()
-
 ```
 
 

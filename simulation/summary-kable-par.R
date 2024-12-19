@@ -10,13 +10,13 @@
 ##
 ## TABLE 1 ----
 ##
-.table.sauc <- function(Sn=1,npt.n=1,p=7){
+.table.par <- function(Sn=1,npt.n=1,p=7){  ## res.row = 1(logit-sensitivity);res.row = 2(logit-specificity)
   
   res = NULL
   for(mark.n in 1:5){
     
   load(paste0(p,"npt/simipd_npt",npt.n,"_marker",mark.n ,"_S",Sn,".RData"))
-  DATA[c(1:10, 12), DATA[11,]!=0] <- NA
+  DATA[c(1:10, 1:2), DATA[11,]!=0] <- NA
   dim1 <- nrow(DATA)
   dim2 <- 3
   
@@ -24,36 +24,37 @@
   
   dim(DATA) <- c(dim1, dim2, 1000)
   
-  med <- apply(DATA, 1:2, function(x) median(x, na.rm = TRUE))[12,]
-  q1  <- apply(DATA, 1:2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))[12,]
-  q3  <- apply(DATA, 1:2, function(x) quantile(x, probs = 0.75, na.rm = TRUE))[12,]
-  conv<- 1-apply(DATA, 1:2, function(x) mean(x, na.rm = TRUE))[11,3]
+  med <- apply(DATA, 1:2, function(x) mean(x, na.rm = TRUE))[1:9,]
+  q1  <- apply(DATA, 1:2, function(x) quantile(x, probs = 0.25, na.rm = TRUE))[1:9,]
+  q3  <- apply(DATA, 1:2, function(x) quantile(x, probs = 0.75, na.rm = TRUE))[1:9,]
+  # conv<- 1-apply(DATA, 1:2, function(x) mean(x, na.rm = TRUE))[11,3]
   sn = apply(DATA, 1:2, function(x) mean(x, na.rm = TRUE))[13,]
   
   s=sprintf("%1.f (%1.f)",sn[1], sn[2])
-  sauc=sprintf("%.2f (%.2f, %.2f)",med, q1, q3)
-  res = rbind(res, c(s, mark.n, sauc, round(conv*100,2), 
-                     sprintf("%.2f", (med[2]-med[1])), sprintf("%.2f", (med[3]-med[1]))))
+  sauc=matrix(sprintf("%.2f (%.2f, %.2f)",med, q1, q3), nrow=9, ncol=3)[1:2,]
+  res = rbind(res, cbind(rbind(s,""), c(mark.n,""), c("$\\mu_{se}$","$\\mu_{sp}$"),sauc,
+                     sprintf("%.2f", (med[1:2,2]-med[1:2,1])), sprintf("%.2f", (med[1:2,3]-med[1:2,1]))
+  ))
                      # sprintf("%.2f", 100*(med[3]-med[2])/(med[2]-med[1]))))
   }
   
   
-  colnames(res) <- c("$S (N)$","B","BNM$_P$", "BNM$_O$", "Proposal", "CR", "PB", "Bias")
-  
+  colnames(res) <- c("$S (N)$","B","Par","BNM$_P$", "BNM$_O$", "Proposal","PB","Bias")
+  rownames(res) = NULL
   # gsub("NaN \\(NA\\)", "", res)
   
   return(res)
 }
 
-tab.npt1 <- rbind(
-  .table.sauc(1,1,7),
-  .table.sauc(2,1,7),
-  .table.sauc(3,1,7))
+tab.par1 = rbind(
+.table.par(1,1,7),
+.table.par(2,1,7),
+.table.par(3,1,7))
 
-tab.npt2 <- rbind(
-  .table.sauc(1,2,7),
-  .table.sauc(2,2,7),
-  .table.sauc(3,2,7))
+tab.par2 = rbind(
+  .table.par(1,2,7),
+  .table.par(2,2,7),
+  .table.par(3,2,7))
 
 
 tab.npt1 <- rbind(

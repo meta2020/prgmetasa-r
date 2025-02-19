@@ -91,7 +91,7 @@ sumtab[,c(1:4,6,8:11)] %>%
   footnote(general = "
 			B denotes the scenarios of biomarker coresponding to Table 2;
 			CR shows convergence rate of the proposed method;
-			estimates are summarized by median (first quantile, third quantiles);
+			estimates are summarized by median (first quantile, third quantile);
       RB denotes reporting bias;
       Bias denotes bias of the proposed method.", 
    escape = FALSE, 
@@ -158,6 +158,7 @@ sauc.all = rbind(tab.npt1, tab.npt2)
 sauc.all[-seq(1,36,6),1] <- ""
 sumtab = cbind(npt,sauc.all)
 
+
 sumtab[,c(1:4,6,8:11)] %>%
   kbl(
     caption = "Comparison of medians with the first and third quantiles of estimates of SAUC(2) by the HZ model and the proposed method.",
@@ -173,7 +174,7 @@ sumtab[,c(1:4,6,8:11)] %>%
   footnote(general = "
 			B denotes the scenarios of biomarker coresponding to Table 2;
 			CR shows convergence rate of the proposed method;
-			estimates are summarized by median (first quantile, third quantiles);
+			estimates are summarized by median (first quantile, third quantile);
       RB denotes reporting bias;
       Bias denotes bias of the proposed method.", 
            escape = FALSE, 
@@ -223,3 +224,4 @@ atab[,c(8,9,7,1:6)]%>%
            escape = FALSE, 
            threeparttable = TRUE,  
            general_title = "") 
+

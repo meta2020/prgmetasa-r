@@ -20,13 +20,17 @@ If they are not installed, please install from R CRAN `install.packages("package
 
 - [exampledata](exampledata/): the data used in Application
 
-- [simulation](simulation/): the simulation codes
+- [simulation](simulation-new/): the simulation codes and results
 
-	-	Step 1. calculate the alpha using `alpha-calc.R` (can be omit)
+	- [main-simulation](main-simulation/): the simulation codes
 
-	-	Step 2. do simulation using `comp-npt.R` when distribution of censoring is correctly specified; do simulation using `comp-npt-mis.R` when distribution of censoring is not correctly specified
+		-	Step 1. calculate the alpha using `alpha-calc.R` (can be omit)
 
-	-	Step 3. Create summarize table using `summary-kable.R` for summarizing SAUC; summarize table using `summary-kable-par.R` for summarizing parameters
+		-	Step 2. do simulation using `main-simulation-comp-npt.R` when distribution of censoring is correctly specified; do simulation using `main-simulation-comp-npt-mis.R` when distribution of censoring is not correctly specified
+
+	- [5npt](5npt/), [7npt](5npt/), [nptmis-LN](nptmis-LN/), [nptmis-UNIF](nptmis-UNIF/): results are saved in these folders
+
+	-	Step 3. Create summarize table in Latex using `summary-kable.R` for summarizing SAUC; summarize table using `summary-kable-par.R` for summarizing parameters; or, print results in HTML using `summary-kable-print.Rmd` and `summary-kable-par-print.Rmd`.
 
 
 

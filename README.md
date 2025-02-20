@@ -20,7 +20,7 @@ If they are not installed, please install from R CRAN `install.packages("package
 
 - [exampledata](exampledata/): the data used in Application
 
-- [simulation](simulation-new/): the simulation codes and results
+- [simulation-new](simulation-new/): the simulation codes and results
 
 	- [main-simulation](main-simulation/): the simulation codes
 
